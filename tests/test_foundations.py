@@ -1,5 +1,4 @@
 from pathlib import Path
-import tempfile
 import threading
 import unittest
 from unittest.mock import Mock, patch
@@ -9,12 +8,12 @@ from core.errors import HubError
 from core.installer import HubService
 from core.settings import SettingsStore
 from core.systemcheck import assess, classify_gpu, detect_hardware, load_thresholds
-from tests.helpers import make_catalog
+from tests.helpers import TemporaryDirectory, make_catalog
 
 
 class FoundationsTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
 

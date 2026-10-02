@@ -1,15 +1,15 @@
 from pathlib import Path
-import tempfile
 import unittest
 
 from PIL import Image
 
 from tools.make_icons import ICON_SIZES, make_icons
+from tests.helpers import TemporaryDirectory
 
 
 class MakeIconTests(unittest.TestCase):
     def setUp(self):
-        temporary = tempfile.TemporaryDirectory()
+        temporary = TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
 

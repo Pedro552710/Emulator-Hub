@@ -3,7 +3,6 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
-import tempfile
 import threading
 import unittest
 from unittest.mock import Mock, patch
@@ -15,12 +14,12 @@ from core.installer import HubService
 from core.security import URLPolicy
 from core.storage import read_installed
 from core.winget import MAX_DOWNLOAD, SOURCE_ID, SOURCE_TYPE, SOURCE_URL, WingetClient
-from tests.helpers import Response, make_catalog, windows_executable
+from tests.helpers import TemporaryDirectory, Response, make_catalog, windows_executable
 
 
 class WingetSafetyTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.target = self.root / "installed"
@@ -256,7 +255,7 @@ class WingetSafetyTests(unittest.TestCase):
 
 class WingetServiceIntegrationTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.catalog, _ = make_catalog(self.root)

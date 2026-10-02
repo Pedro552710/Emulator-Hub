@@ -1,7 +1,6 @@
 """Bibliothek und Hub-Service zusammen, ohne einen echten Prozess zu starten."""
 
 from pathlib import Path
-import tempfile
 import threading
 import unittest
 from unittest.mock import Mock, patch
@@ -10,12 +9,12 @@ from core.catalog import Catalog
 from core.errors import HubError
 from core.installer import HubService
 from core.library import LibraryStore
-from tests.helpers import windows_executable
+from tests.helpers import TemporaryDirectory, windows_executable
 
 
 class LibraryIntegrationTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.catalog = Catalog()

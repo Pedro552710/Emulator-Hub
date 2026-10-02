@@ -1,11 +1,11 @@
 """Veröffentlichungsprüfung: Risiken erkennen, Inhalte niemals ausgeben."""
 import json
 from pathlib import Path
-import tempfile
 import unittest
 import zipfile
 
 from tools.audit_publication import audit, inspect_text
+from tests.helpers import TemporaryDirectory
 
 
 class PublicationAuditTests(unittest.TestCase):
@@ -30,7 +30,7 @@ class PublicationAuditTests(unittest.TestCase):
         self.assertFalse(inspect_text("test-artifacts/example.log", path, ignored=True)[0]["blocking"])
 
     def test_gitignore_uses_git_semantics_without_initializing_workspace(self):
-        with tempfile.TemporaryDirectory() as temporary:
+        with TemporaryDirectory() as temporary:
             root = Path(temporary)
             (root / ".gitignore").write_text("test-artifacts/\nsettings.json\n", encoding="utf-8")
             (root / "README.md").write_text("Beispiel", encoding="utf-8")
@@ -45,7 +45,7 @@ class PublicationAuditTests(unittest.TestCase):
             self.assertFalse((root / ".git").exists())
 
     def test_workbook_xml_secret_and_embedded_game_are_examined(self):
-        with tempfile.TemporaryDirectory() as temporary:
+        with TemporaryDirectory() as temporary:
             root = Path(temporary)
             (root / ".gitignore").write_text("", encoding="utf-8")
             with zipfile.ZipFile(root / "example.xlsx", "w") as archive:
@@ -57,7 +57,7 @@ class PublicationAuditTests(unittest.TestCase):
             self.assertNotIn("unknown-value", json.dumps(report))
 
     def test_unknown_binary_outside_ignored_folders_blocks(self):
-        with tempfile.TemporaryDirectory() as temporary:
+        with TemporaryDirectory() as temporary:
             root = Path(temporary)
             (root / ".gitignore").write_text("", encoding="utf-8")
             (root / "emulator.exe").write_bytes(b"MZ" + b"fake fixture")
@@ -65,7 +65,7 @@ class PublicationAuditTests(unittest.TestCase):
             self.assertEqual(report["blocking_findings"][0]["path"], "emulator.exe")
 
     def test_renamed_binary_and_rom_signatures_block_without_ignoring_markdown(self):
-        with tempfile.TemporaryDirectory() as temporary:
+        with TemporaryDirectory() as temporary:
             root = Path(temporary)
             (root / ".gitignore").write_text("", encoding="utf-8")
             (root / "README.md").write_text("# Emulator Hub\nEin normales Markdown-Dokument.", encoding="utf-8")

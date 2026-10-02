@@ -2,7 +2,6 @@
 
 import ctypes
 from pathlib import Path
-import tempfile
 import threading
 import unittest
 from unittest.mock import Mock, patch
@@ -12,7 +11,7 @@ from core.controllers import (
 )
 from core.errors import Cancelled, HubError
 from core.installer import HubService
-from tests.helpers import make_catalog, windows_executable
+from tests.helpers import TemporaryDirectory, make_catalog, windows_executable
 
 
 class FakeXInput:
@@ -82,7 +81,7 @@ class XInputTests(unittest.TestCase):
 
 class ControllerConfigTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = TemporaryDirectory()
         self.root = Path(self.temp.name)
         self.catalog, original = make_catalog(self.root)
         self.entry = self.catalog.by_id(original["id"])

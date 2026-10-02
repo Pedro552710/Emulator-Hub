@@ -1,7 +1,6 @@
 import json
 import os
 from pathlib import Path
-import tempfile
 import threading
 import unittest
 from unittest.mock import patch
@@ -9,12 +8,12 @@ from unittest.mock import patch
 from core.catalog import Catalog, CatalogError
 from core.errors import Cancelled, HubError
 from core.profiles import assert_not_game_file, check_bios, game_protection, profile_paths
-from tests.helpers import make_catalog
+from tests.helpers import TemporaryDirectory, make_catalog
 
 
 class ProfileTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.emulator = self.root / "emulator" / "nested"

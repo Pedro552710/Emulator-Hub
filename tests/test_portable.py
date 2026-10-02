@@ -2,7 +2,6 @@ import json
 import os
 from pathlib import Path
 import shutil
-import tempfile
 import threading
 import unittest
 from unittest.mock import Mock, patch
@@ -12,12 +11,12 @@ from core.installer import HubService, default_data_dir
 from core.settings import SettingsStore
 from core.state import read_json
 from core.storage import read_installed
-from tests.helpers import make_catalog, windows_executable
+from tests.helpers import TemporaryDirectory, make_catalog, windows_executable
 
 
 class PortableTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
 
@@ -103,7 +102,7 @@ class PortableTests(unittest.TestCase):
 
 class ComfortServiceTests(unittest.TestCase):
     def test_service_routes_bios_backup_and_restore_with_safety_backup(self):
-        with tempfile.TemporaryDirectory() as temporary:
+        with TemporaryDirectory() as temporary:
             root = Path(temporary)
             catalog, entry = make_catalog(root)
             entry["bios"] = [{"label": "Eigene Firmware", "root": "emulator", "directory": "firmware", "filenames": ["own.bin"], "required": True}]

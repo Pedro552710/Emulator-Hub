@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-import tempfile
 import unittest
 from unittest.mock import Mock, patch
 
@@ -8,12 +7,12 @@ from core.errors import HubError
 from core.github import GitHubClient
 from core.security import URLPolicy
 from core.storage import read_installed, write_installed
-from tests.helpers import Response
+from tests.helpers import TemporaryDirectory, Response
 
 
 class StorageTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.path = Path(self.temp.name) / "installed.json"
         self.record = {"emulator": {"path": "C:/managed/emulator", "exe_path": "C:/managed/emulator/program.exe", "version": "v1.0", "date": "2026-10-01"}}

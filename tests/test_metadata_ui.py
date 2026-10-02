@@ -1,6 +1,5 @@
 """Cover-Oberfläche ohne Accounts, Netzwerk oder Änderungen an Spiel-Dateien."""
 from pathlib import Path
-import tempfile
 import threading
 import time
 import unittest
@@ -14,6 +13,7 @@ from core.catalog import Catalog
 from core.installer import HubService
 from ui.metadata import CandidateDialog, GameDetailsDialog
 from ui.window import MainWindow
+from tests.helpers import TemporaryDirectory
 
 
 class MetadataUiTests(unittest.TestCase):
@@ -23,7 +23,7 @@ class MetadataUiTests(unittest.TestCase):
         cls.app.setQuitOnLastWindowClosed(False)
 
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = TemporaryDirectory()
         self.root = Path(self.temp.name)
         self.catalog = Catalog()
         self.service = HubService(self.catalog, self.root / "data")

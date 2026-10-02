@@ -1,6 +1,5 @@
 """Neue native Seiten bleiben mit der vorhandenen Startlogik verbunden."""
 from pathlib import Path
-import tempfile
 import threading
 import unittest
 from unittest.mock import Mock, patch
@@ -11,7 +10,7 @@ from PySide6.QtWidgets import QApplication, QDialog
 
 from core.catalog import Catalog
 from core.installer import HubService
-from tests.helpers import windows_executable
+from tests.helpers import TemporaryDirectory, windows_executable
 from ui.window import MainWindow
 
 
@@ -22,7 +21,7 @@ class ComfortIntegrationTests(unittest.TestCase):
         cls.app.setQuitOnLastWindowClosed(False)
 
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = TemporaryDirectory()
         self.root = Path(self.temp.name)
         self.service = HubService(Catalog(), self.root / "data")
         self.service.settings.set("system_report", {"cpu_cores": 8, "ram_gb": 16, "gpu_score": 3})

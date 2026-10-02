@@ -1,7 +1,6 @@
 """Couch-Bedienung ohne echten Controller, Netzwerk oder Emulatorprozess."""
 
 from pathlib import Path
-import tempfile
 import threading
 from types import SimpleNamespace
 import time
@@ -14,6 +13,7 @@ from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QComboBox, QInputDialog, QMessageBox, QPushButton
 
 from ui.couch import CouchDialog, _cover_pixmap
+from tests.helpers import TemporaryDirectory
 
 
 def state(*buttons, lx=0.0, ly=0.0, slot=0):
@@ -351,7 +351,7 @@ class CouchUiTests(unittest.TestCase):
         self.assertTrue(self.dialog.isVisible())
 
     def test_offline_metadata_cover_and_invalid_image_placeholder(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with TemporaryDirectory() as directory:
             cover = Path(directory) / "cover.png"
             image = QImage(100, 150, QImage.Format.Format_ARGB32)
             image.fill(QColor("#dd5533"))
@@ -394,7 +394,7 @@ class CouchUiTests(unittest.TestCase):
             image.fill(QColor("#dd5533"))
             return image
 
-        with tempfile.TemporaryDirectory() as directory:
+        with TemporaryDirectory() as directory:
             path = Path(directory) / "cover.png"
             path.write_bytes(b"Testdatei")
             self.service.metadata = SimpleNamespace(get=lambda identifier: {"cover_path": str(path)} if identifier == "a" else None)

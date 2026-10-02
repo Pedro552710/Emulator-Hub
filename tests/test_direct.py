@@ -2,7 +2,6 @@
 import hashlib
 import io
 from pathlib import Path
-import tempfile
 import threading
 import unittest
 from unittest.mock import Mock, patch
@@ -10,12 +9,12 @@ import zipfile
 
 from core.errors import HubError
 from core.installer import HubService
-from tests.helpers import make_catalog, Response, windows_executable
+from tests.helpers import TemporaryDirectory, make_catalog, Response, windows_executable
 
 
 class DirectDownloadTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.catalog, self.entry = make_catalog(self.temp.name)
         self.entry.update(install_methode="auto_direct", direct_url="https://github.com/official/emulator/releases/download/v1/emulator.zip", direct_version="1.0")

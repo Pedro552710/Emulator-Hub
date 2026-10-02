@@ -1,7 +1,6 @@
 """Logo-Auswahl und Darstellung ohne Downloads oder echte Benutzerdaten."""
 
 from pathlib import Path
-import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -10,6 +9,7 @@ from PySide6.QtGui import QColor, QImage, QPainter, QRegion
 from PySide6.QtWidgets import QApplication, QWidget
 
 from ui.branding import HubLogo, application_icon, logo_path
+from tests.helpers import TemporaryDirectory
 
 
 class BrandingTests(unittest.TestCase):
@@ -31,7 +31,7 @@ class BrandingTests(unittest.TestCase):
         path.write_text('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#4388ed"/></svg>', encoding="utf-8")
 
     def test_external_png_takes_precedence_over_bundled_svg(self):
-        with tempfile.TemporaryDirectory() as temp:
+        with TemporaryDirectory() as temp:
             root = Path(temp)
             external, bundled = root / "program", root / "embedded"
             self.png(external / "assets" / "logo.png")
@@ -43,7 +43,7 @@ class BrandingTests(unittest.TestCase):
                 self.assertEqual(icon.pixmap(QSize(128, 128)).toImage().pixelColor(64, 64), QColor("#e74c3c"))
 
     def test_sidebar_preserves_png_aspect_ratio_at_double_scale(self):
-        with tempfile.TemporaryDirectory() as temp:
+        with TemporaryDirectory() as temp:
             root = Path(temp)
             self.png(root / "assets" / "logo.png")
             with patch("ui.branding.app_directory", return_value=root), patch("ui.branding.resource_path", return_value=root / "assets"):
@@ -62,7 +62,7 @@ class BrandingTests(unittest.TestCase):
                 widget.deleteLater()
 
     def test_svg_preferred_in_same_directory_and_missing_assets_have_fallback(self):
-        with tempfile.TemporaryDirectory() as temp:
+        with TemporaryDirectory() as temp:
             root = Path(temp)
             self.png(root / "assets" / "logo.png")
             self.svg(root / "assets" / "logo.svg")

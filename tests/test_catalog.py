@@ -1,15 +1,14 @@
 import json
 from pathlib import Path
-import tempfile
 import unittest
 
 from core.catalog import Catalog, CatalogError
-from tests.helpers import make_catalog
+from tests.helpers import TemporaryDirectory, make_catalog
 
 
 class CatalogSafetyTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.catalog, self.entry = make_catalog(self.temp.name)
         self.path = Path(self.temp.name) / "catalog.json"

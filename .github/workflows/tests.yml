@@ -43,6 +43,11 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Die Prüfung der Repository-Dateien ist fehlgeschlagen.' }
       - name: Offline-Tests ausführen
         run: |
+          if ([string]::IsNullOrWhiteSpace($env:RUNNER_TEMP)) { throw 'RUNNER_TEMP ist nicht gesetzt.' }
+          $testTemp = & .\.venv\Scripts\python.exe -c "import os; from pathlib import Path; print(Path(os.environ['RUNNER_TEMP']).resolve(strict=True))"
+          if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $testTemp -PathType Container)) { throw 'Der aufgelöste Temp-Ordner ist nicht verfügbar.' }
+          $env:TEMP = $testTemp
+          $env:TMP = $testTemp
           & .\.venv\Scripts\python.exe -m unittest discover -s tests -t . -v
           if ($LASTEXITCODE -ne 0) { throw 'Tests fehlgeschlagen.' }
       - name: Programmstart prüfen

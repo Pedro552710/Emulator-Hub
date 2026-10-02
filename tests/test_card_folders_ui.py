@@ -1,7 +1,6 @@
 """Native Kartenaktionen ohne Explorer- oder Fremdprozess-Start prüfen."""
 
 from pathlib import Path
-import tempfile
 import unittest
 from unittest.mock import Mock, call, patch
 
@@ -12,7 +11,7 @@ from PySide6.QtWidgets import QApplication
 from core.catalog import Catalog
 from core.errors import HubError
 from core.installer import HubService
-from tests.helpers import windows_executable
+from tests.helpers import TemporaryDirectory, windows_executable
 from ui.window import MainWindow
 
 
@@ -23,7 +22,7 @@ class CardFolderUiTests(unittest.TestCase):
         cls.app.setQuitOnLastWindowClosed(False)
 
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = TemporaryDirectory()
         self.root = Path(self.temp.name)
         self.catalog = Catalog()
         self.service = HubService(self.catalog, self.root / "data")

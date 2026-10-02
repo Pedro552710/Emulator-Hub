@@ -1,7 +1,6 @@
 """Native Qt smoke regressions with no download or process launch."""
 
 from pathlib import Path
-import tempfile
 import threading
 import time
 from types import SimpleNamespace
@@ -14,6 +13,7 @@ from PySide6.QtWidgets import QApplication, QDialog
 
 from core.errors import HubError
 from ui.window import MainWindow
+from tests.helpers import TemporaryDirectory
 
 
 class FakeService:
@@ -52,7 +52,7 @@ class NativeWindowTests(unittest.TestCase):
         cls.app.setQuitOnLastWindowClosed(False)
 
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = TemporaryDirectory()
         self.catalog = fake_catalog()
         self.service = FakeService(Path(self.temp.name) / "hub.log")
         self.window = MainWindow(self.service, self.catalog)

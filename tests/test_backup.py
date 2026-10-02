@@ -3,7 +3,6 @@ import json
 import os
 from pathlib import Path
 import stat
-import tempfile
 import threading
 import unittest
 from unittest.mock import patch
@@ -11,11 +10,12 @@ import zipfile
 
 from core.backup import BackupManager, MANIFEST
 from core.errors import Cancelled, HubError
+from tests.helpers import TemporaryDirectory
 
 
 class BackupTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.emulator = self.root / "emulator"

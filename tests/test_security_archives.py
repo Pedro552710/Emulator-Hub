@@ -2,7 +2,6 @@ import io
 from pathlib import Path
 import stat
 import tarfile
-import tempfile
 import threading
 import unittest
 from unittest.mock import Mock, patch
@@ -11,7 +10,7 @@ import zipfile
 from core.archives import extract_archive, remove_managed_tree, safe_member
 from core.errors import Cancelled, HubError
 from core.security import URLPolicy
-from tests.helpers import Response
+from tests.helpers import TemporaryDirectory, Response
 
 
 class URLPolicyTests(unittest.TestCase):
@@ -86,7 +85,7 @@ class URLPolicyTests(unittest.TestCase):
 
 class ArchiveSafetyTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.destination = self.root / "unpacked"

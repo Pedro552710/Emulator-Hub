@@ -1,7 +1,6 @@
 """Controller-Assistent: echte Qt-Aufträge, Bestätigung und simulierte Hardware."""
 
 from pathlib import Path
-import tempfile
 import threading
 import time
 import unittest
@@ -12,7 +11,7 @@ from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QMessageBox
 
 from core.installer import HubService
-from tests.helpers import make_catalog, windows_executable
+from tests.helpers import TemporaryDirectory, make_catalog, windows_executable
 from ui.controllers import ControllerDialog
 
 
@@ -35,7 +34,7 @@ class ControllerUiTests(unittest.TestCase):
         cls.app.setQuitOnLastWindowClosed(False)
 
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = TemporaryDirectory()
         self.root = Path(self.temp.name)
         self.catalog, original = make_catalog(self.root)
         self.entry = self.catalog.by_id(original["id"])

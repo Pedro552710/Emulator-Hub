@@ -6,7 +6,6 @@ import io
 import json
 from pathlib import Path
 import shutil
-import tempfile
 import threading
 import unittest
 from unittest.mock import patch
@@ -17,7 +16,7 @@ import requests
 from core.errors import Cancelled, HubError
 from core.metadata import MAX_COVER, MetadataService, clean_game_name
 from core.settings import SettingsStore
-from tests.helpers import Response
+from tests.helpers import TemporaryDirectory, Response
 
 
 class Vault:
@@ -73,7 +72,7 @@ def ss_game():
 
 class MetadataTests(unittest.TestCase):
     def setUp(self):
-        self.temporary = tempfile.TemporaryDirectory()
+        self.temporary = TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         self.settings = SettingsStore(self.root)

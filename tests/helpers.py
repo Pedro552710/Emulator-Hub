@@ -1,8 +1,17 @@
 import json
 from pathlib import Path
 import struct
+import tempfile
 
 from core.catalog import Catalog, LEGAL_NOTICE
+
+
+class TemporaryDirectory(tempfile.TemporaryDirectory):
+    """Testordner mit Langpfad, auch wenn TEMP/TMP einen Windows-Kurznamen enthält."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.name = str(Path(self.name).resolve())
 
 
 def windows_executable(marker=b"version-one", *, machine=0x8664):

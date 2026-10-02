@@ -1,17 +1,16 @@
 from pathlib import Path
-import tempfile
 import unittest
 from unittest.mock import Mock, patch
 
 from core.errors import HubError
 from core.installer import HubService
 from core.launch import build_launch_command, compatible_entries, launch_game
-from tests.helpers import make_catalog, windows_executable
+from tests.helpers import TemporaryDirectory, make_catalog, windows_executable
 
 
 class LaunchTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.catalog, self.entry = make_catalog(self.root)
