@@ -14,11 +14,13 @@ Emulator Hub ist eine deutsche Desktop-Anwendung für Windows, die Emulatoren ve
 
 ## Screenshots
 
-Platzhalter: Hier können eigene Screenshots der Startseite, Bibliothek und des Couch-Modus ergänzt werden. Vor Veröffentlichung persönliche Dateipfade und fremde Cover entfernen; Screenshots sind derzeit nicht beigefügt.
+![Startseite](docs/images/start.png)
+![Emulator-Übersicht](docs/images/emulatoren.png)
+![Bibliothek](docs/images/bibliothek.png)
 
 ## Download und Start
 
-Die Windows-Pakete stehen nach der ersten Veröffentlichung im Bereich **Releases** dieses GitHub-Repositorys:
+Die Windows-Pakete stehen im Bereich Releases dieses GitHub-Repositorys:
 
 - `EmulatorHub-Setup.exe`: Installation für den aktuellen Benutzer, ohne Administratorrechte, mit Startmenü-Eintrag und optionalem Desktop-Icon.
 - `EmulatorHub-<Version>-portable.zip`: vollständig entpacken und `EmulatorHub.exe` starten. Den kompletten Ordner einschließlich `_internal` behalten; `portable.flag` aktiviert lokale Daten unter `data`.
