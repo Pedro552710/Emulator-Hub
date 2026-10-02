@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "ram_tolerance_gb": 0.5,
+  "disclaimer": "Grobe Einschätzung anhand von CPU-Kernen, RAM und GPU-Klasse – keine Garantie. Takt, Architektur, Treiber, Auflösung und einzelne Spiele können das Ergebnis stark verändern.",
+  "gpu_classes": {
+    "unknown": 0,
+    "integrated": 1,
+    "dedicated": 2,
+    "high_end": 3
+  },
+  "gpu_keywords": {
+    "unknown": ["basic display", "basic render", "remote display", "virtual", "vmware", "parallels"],
+    "high_end": ["rtx 3080", "rtx 3090", "rtx 4070", "rtx 4080", "rtx 4090", "rtx 5070", "rtx 5080", "rtx 5090", "rx 6800", "rx 6900", "rx 7800", "rx 7900", "rx 9070"],
+    "dedicated": ["geforce", "radeon rx", "radeon pro", "quadro", "intel arc"],
+    "integrated": ["intel", "radeon graphics", "radeon vega", "radeon 780m", "radeon 680m", "radeon 880m", "radeon 890m"]
+  },
+  "levels": {
+    "Sehr niedrig": {"minimum": {"cpu_cores": 1, "ram_gb": 2, "gpu_score": 0}, "recommended": {"cpu_cores": 2, "ram_gb": 4, "gpu_score": 0}},
+    "Niedrig": {"minimum": {"cpu_cores": 2, "ram_gb": 4, "gpu_score": 0}, "recommended": {"cpu_cores": 4, "ram_gb": 8, "gpu_score": 1}},
+    "Mittel": {"minimum": {"cpu_cores": 4, "ram_gb": 8, "gpu_score": 1}, "recommended": {"cpu_cores": 6, "ram_gb": 16, "gpu_score": 2}},
+    "Hoch": {"minimum": {"cpu_cores": 4, "ram_gb": 8, "gpu_score": 1}, "recommended": {"cpu_cores": 6, "ram_gb": 16, "gpu_score": 2}},
+    "Sehr hoch": {"minimum": {"cpu_cores": 6, "ram_gb": 16, "gpu_score": 2}, "recommended": {"cpu_cores": 8, "ram_gb": 32, "gpu_score": 3}}
+  }
+}

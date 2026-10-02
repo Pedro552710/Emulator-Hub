@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <title>Emulator Hub</title>
+  <desc>Ein eigenständiges Controller-Symbol auf einem dunklen, abgerundeten Quadrat.</desc>
+  <rect x="8" y="8" width="240" height="240" rx="54" fill="#192432" stroke="#34465c" stroke-width="6"/>
+  <path d="M78 82h100c19 0 31 13 36 33l15 58c5 20-18 31-31 16l-26-29H84l-26 29c-13 15-36 4-31-16l15-58c5-20 17-33 36-33z" fill="#62dfb6"/>
+  <path d="M75 108h14v15h15v14H89v15H75v-15H60v-14h15z" fill="#192432"/>
+  <circle cx="175" cy="114" r="9" fill="#192432"/>
+  <circle cx="194" cy="135" r="9" fill="#192432"/>
+  <rect x="116" y="133" width="24" height="7" rx="3.5" fill="#192432"/>
+</svg>

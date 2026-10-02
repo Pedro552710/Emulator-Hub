@@ -1,0 +1,44 @@
+name: Fehler melden
+description: Ein Problem mit Emulator Hub beschreiben.
+title: "[Fehler] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Danke für deinen Bericht. Bitte entferne Zugangsdaten, Tokens, Benutzernamen und persönliche Pfade aus Logs und Bildern. Keine ROMs, BIOS-Dateien, Firmware oder Emulator-Binaries anhängen.
+  - type: input
+    id: windows
+    attributes:
+      label: Windows-Version
+      description: Zum Beispiel Windows 11 x64, Version 24H2.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Programmversion
+      description: Version aus dem Fenstertitel; zusätzlich Installer, portable ZIP oder Python-Start nennen.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Schritte zum Fehler
+      description: Was hast du getan, welche Konsole oder Funktion ist betroffen?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Erwartetes und tatsächliches Verhalten
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Logauszug
+      description: Relevante Zeilen aus hub.log, ohne Zugangsdaten oder persönliche Pfade. Ohne vorhandenes Log bitte angeben.
+      render: text
+    validations:
+      required: true

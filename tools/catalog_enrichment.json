@@ -1,0 +1,1285 @@
+{
+  "verified_at": "2026-10-01",
+  "official_sources": [
+    "https://www.mesen.ca/",
+    "https://github.com/nesdev-org/MesenCE",
+    "https://github.com/bsnes-emu/bsnes",
+    "https://github.com/snes9xgit/snes9x",
+    "https://sameboy.github.io/",
+    "https://github.com/LIJI32/SameBoy",
+    "https://mgba.io/",
+    "https://github.com/mgba-emu/mgba",
+    "https://www.mupen64plus.org/",
+    "https://github.com/mupen64plus/mupen64plus-core",
+    "https://dolphin-emu.org/",
+    "https://dl.dolphin-emu.org/",
+    "https://github.com/melonDS-emu/melonDS",
+    "https://azahar-emu.org/",
+    "https://github.com/azahar-emu/azahar",
+    "https://cemu.info/",
+    "https://github.com/cemu-project/Cemu",
+    "https://www.duckstation.org/",
+    "https://github.com/stenzek/duckstation",
+    "https://pcsx2.net/",
+    "https://github.com/PCSX2/pcsx2",
+    "https://rpcs3.net/",
+    "https://www.ppsspp.org/",
+    "https://github.com/hrydgard/ppsspp",
+    "https://vita3k.org/",
+    "https://github.com/Vita3K/Vita3K",
+    "https://www.retrodev.com/blastem/",
+    "https://github.com/ekeeke/Genesis-Plus-GX",
+    "https://www.retroarch.com/",
+    "https://mednafen.github.io/",
+    "https://www.yabasanshiro.com/",
+    "https://github.com/flyinghead/flycast",
+    "https://xemu.app/",
+    "https://github.com/xemu-project/xemu",
+    "https://xenia.jp/",
+    "https://github.com/xenia-canary/xenia-canary",
+    "https://stella-emu.github.io/",
+    "https://github.com/stella-emu/stella",
+    "https://github.com/finalburnneo/FBNeo",
+    "https://www.mamedev.org/"
+  ],
+  "entries": {
+    "Nintendo|NES": {
+      "id": "mesen",
+      "install_methode": "auto_github",
+      "github_repo": "nesdev-org/MesenCE",
+      "download_muster": "^Mesen_[0-9.]+_Windows\\.zip$",
+      "exe": "Mesen.exe",
+      "archive_type": "zip",
+      "verified_release": "2.2.1",
+      "verified_asset": "Mesen_2.2.1_Windows.zip",
+      "verified_asset_sha256": "c19e10b3b3865eb0e86e4d01bf09a5027a4452081c04b5bd5b6cbbf76e346fd6",
+      "hinweis": "Die offizielle Mesen-Seite verweist inzwischen auf MesenCE. Automatisch wird das Windows-10+-Paket dieses offiziellen Nachfolgeprojekts installiert.",
+      "install_begruendung": "Geprüfter stabiler GitHub-Release mit eindeutigem Windows-x64-ZIP und bestätigter Startdatei.",
+      "manuelle_schritte": [
+        "Die offizielle Downloadseite öffnen.",
+        "Den aktuellen stabilen Release und das Windows-x64-ZIP wählen. ARM64-, Debug-, Symbol- und Quellcode-Pakete überspringen.",
+        "Das ganze Archiv in einen eigenen beschreibbaren Ordner entpacken.",
+        "Mesen.exe starten und mit „Ordner auswählen“ den entpackten Ordner registrieren."
+      ],
+      "bios": [],
+      "backup_paths": [
+        {
+          "label": "Spielstände",
+          "root": "documents",
+          "directory": "Mesen2/Saves",
+          "type": "directory",
+          "portable": {
+            "marker": "settings.json",
+            "directory": "Saves"
+          }
+        },
+        {
+          "label": "Speicherzustände",
+          "root": "documents",
+          "directory": "Mesen2/SaveStates",
+          "type": "directory",
+          "portable": {
+            "marker": "settings.json",
+            "directory": "SaveStates"
+          }
+        },
+        {
+          "label": "Einstellungen",
+          "root": "documents",
+          "directory": "Mesen2/settings.json",
+          "type": "file",
+          "portable": {
+            "marker": "settings.json",
+            "directory": "settings.json"
+          }
+        }
+      ],
+      "bios_note": "Für den normalen Modulbetrieb sind keine zusätzlichen eigenen BIOS-Dateien erforderlich.",
+      "backup_note": "Standard: Windows-Dokumente/Mesen2. Eine vorhandene settings.json neben der EXE aktiviert das native portable Profil und wird berücksichtigt. Eigene abweichende Save-Pfade gezielt zuordnen.",
+      "launch_args": [
+        "{game}"
+      ],
+      "controller_config": "manuell",
+      "controller_manual": "Mesen öffnen → Einstellungen/Settings → Eingabe/Input. Controller für Spieler 1 wählen, jede Taste zuordnen und speichern."
+    },
+    "Nintendo|SNES": {
+      "id": "bsnes",
+      "auto_emulator": "bsnes",
+      "alternative_exes": [
+        "snes9x-x64.exe",
+        "snes9x.exe"
+      ],
+      "install_methode": "auto_github",
+      "github_repo": "bsnes-emu/bsnes",
+      "download_muster": "^bsnes_v[0-9]+-windows\\.zip$",
+      "exe": "bsnes.exe",
+      "archive_type": "zip",
+      "verified_release": "v115",
+      "verified_asset": "bsnes_v115-windows.zip",
+      "verified_asset_sha256": null,
+      "hinweis": "Automatisch wird bsnes installiert. Snes9x bleibt die manuelle Tabellenalternative für schwächere PCs.",
+      "install_begruendung": "Geprüfter stabiler GitHub-Release mit eindeutigem Windows-x64-ZIP und bestätigter Startdatei.",
+      "manuelle_schritte": [
+        "Die offizielle Downloadseite öffnen.",
+        "Den aktuellen stabilen Release und das Windows-x64-ZIP wählen. ARM64-, Debug-, Symbol- und Quellcode-Pakete überspringen.",
+        "Das ganze Archiv in einen eigenen beschreibbaren Ordner entpacken.",
+        "bsnes.exe starten und mit „Ordner auswählen“ den entpackten Ordner registrieren.",
+        "Alternativ Snes9x von https://github.com/snes9xgit/snes9x/releases wählen und beim Registrieren dessen vorhandene Startdatei auswählen."
+      ],
+      "bios": [],
+      "backup_paths": [
+        {
+          "label": "bsnes-Einstellungen neben Programm",
+          "root": "emulator",
+          "directory": "settings.bml",
+          "type": "file"
+        },
+        {
+          "label": "bsnes-Benutzereinstellungen",
+          "root": "roamingappdata",
+          "directory": "bsnes/settings.bml",
+          "type": "file"
+        }
+      ],
+      "bios_note": "Für den normalen Modulbetrieb sind keine zusätzlichen eigenen BIOS-Dateien erforderlich.",
+      "backup_note": "bsnes speichert normalerweise neben dem Spiel; Snes9x und eigene Verzeichnisoptionen können abweichen. Bitte ausschließlich die eigenen Save-Dateien oder gezielte Save-/State-Ordner ergänzen. Der gesamte Spieleordner wird nicht automatisch gesichert.",
+      "launch_profiles": {
+        "bsnes.exe": [
+          "{game}"
+        ],
+        "snes9x-x64.exe": [
+          "{game}"
+        ],
+        "snes9x.exe": [
+          "{game}"
+        ]
+      },
+      "controller_config": "manuell",
+      "controller_manual": "bsnes: Settings → Input; Snes9x: Input → Input Configuration. Controller für Spieler 1 auswählen, Tasten und Steuerkreuz zuordnen und speichern. Die beiden Programme verwenden unterschiedliche Konfigformate."
+    },
+    "Nintendo|Game Boy / GBC": {
+      "id": "sameboy",
+      "install_methode": "auto_github",
+      "github_repo": "LIJI32/SameBoy",
+      "download_muster": "^sameboy_winsdl_v[0-9.]+\\.zip$",
+      "exe": "sameboy.exe",
+      "archive_type": "zip",
+      "verified_release": "v1.0.3",
+      "verified_asset": "sameboy_winsdl_v1.0.3.zip",
+      "verified_asset_sha256": "66fb05acc075abba860f2c5fa31af2198fef9767573d28834c78d0dfc15746b2",
+      "hinweis": "Portables Windows-x64-Paket; das komplette Archiv wird entpackt.",
+      "install_begruendung": "Geprüfter stabiler GitHub-Release mit eindeutigem Windows-x64-ZIP und bestätigter Startdatei.",
+      "manuelle_schritte": [
+        "Die offizielle Downloadseite öffnen.",
+        "Den aktuellen stabilen Release und das Windows-x64-ZIP wählen. ARM64-, Debug-, Symbol- und Quellcode-Pakete überspringen.",
+        "Das ganze Archiv in einen eigenen beschreibbaren Ordner entpacken.",
+        "sameboy.exe starten und mit „Ordner auswählen“ den entpackten Ordner registrieren."
+      ],
+      "bios": [],
+      "backup_paths": [
+        {
+          "label": "Portable Einstellungen",
+          "root": "emulator",
+          "directory": "prefs.bin",
+          "type": "file"
+        },
+        {
+          "label": "Benutzereinstellungen",
+          "root": "roamingappdata",
+          "directory": "SameBoy/prefs.bin",
+          "type": "file"
+        }
+      ],
+      "bios_note": "Für den normalen Modulbetrieb sind keine zusätzlichen eigenen BIOS-Dateien erforderlich.",
+      "backup_note": "SameBoy speichert Spielstände und Speicherzustände beim Spiel. Eigene Save-Dateien oder gezielte Save-/State-Ordner zuordnen; ganze Spieleordner bleiben ausgeschlossen.",
+      "launch_args": [
+        "{game}"
+      ],
+      "controller_config": "manuell",
+      "controller_manual": "SameBoy öffnen und in den Einstellungen den Bereich für Controller/Steuerung wählen. Das angeschlossene Gamepad auswählen, die Game-Boy-Tasten zuordnen und speichern."
+    },
+    "Nintendo|Game Boy Advance": {
+      "id": "mgba",
+      "install_methode": "manuell",
+      "download_muster": "",
+      "exe": "mGBA.exe",
+      "hinweis": "Die portable Version benötigt ein externes Entpackprogramm mit BCJ2-Unterstützung.",
+      "install_begruendung": "Das offizielle Win64-7z verwendet BCJ2, das py7zr nicht entpacken kann; deshalb zuverlässiger manueller Weg.",
+      "manuelle_schritte": [
+        "Die offizielle mGBA-Seite öffnen und „Current downloads“ verwenden.",
+        "„Windows (64-bit, portable .7z archive)“ wählen.",
+        "Mit einem BCJ2-fähigen Entpackprogramm das ganze Archiv entpacken; alternativ den offiziellen Windows-x64-Installer verwenden.",
+        "mGBA.exe starten und den installierten Ordner registrieren."
+      ],
+      "alternative_exes": [
+        "mgba-sdl.exe"
+      ],
+      "bios": [],
+      "backup_paths": [
+        {
+          "label": "Einstellungen",
+          "root": "roamingappdata",
+          "directory": "mGBA/config.ini",
+          "type": "file"
+        }
+      ],
+      "bios_note": "mGBA enthält einen BIOS-Ersatz. Für den optionalen echten BIOS-Betrieb die eigene Datei im Emulator auswählen und hier als eigene BIOS-Datei zuordnen.",
+      "backup_note": "Standardkonfiguration in AppData/Roaming/mGBA. Portable Builds und Spielstandpfade können abweichen; Spielstände liegen häufig beim Spiel. Eigene Save-Dateien oder gezielte Ordner ergänzen.",
+      "launch_args": [
+        "{game}"
+      ],
+      "controller_config": "manuell",
+      "controller_manual": "mGBA öffnen → Werkzeuge/Tools → Einstellungen/Settings → Controller. Gamepad wählen, Tasten zuordnen und mit Übernehmen speichern."
+    },
+    "Nintendo|Nintendo 64": {
+      "id": "mupen64plus",
+      "install_methode": "manuell",
+      "download_muster": "",
+      "exe": "mupen64plus.exe",
+      "hinweis": "Mupen64Plus ist der Standard. Simple64 ist archiviert. Die Kommandozeilen-Version benötigt beim Start passende Argumente; der Hub konfiguriert keine Frontends.",
+      "install_begruendung": "Mupen64Plus ist ein Kommandozeilen-/Plugin-System; ein automatischer GUI-Start wäre irreführend.",
+      "manuelle_schritte": [
+        "Die offizielle Mupen64Plus-Seite öffnen und den aktuellen Release-Link wählen.",
+        "Das ganze Windows-win64-Bundle herunterladen und entpacken.",
+        "Die Dokumentation zum Kommandozeilen-Frontend bzw. zu kompatiblen Frontends lesen.",
+        "Den Ordner registrieren und die konkrete Frontend-Startdatei auswählen."
+      ],
+      "emulator": "Mupen64Plus",
+      "download_anleitung": "1. Die offizielle Mupen64Plus-Seite öffnen. 2. Den verlinkten stabilen Release aufrufen. 3. Das ganze Windows-win64-Bundle entpacken. 4. Die Dokumentation zum Kommandozeilen-Frontend oder einem kompatiblen Frontend lesen. 5. Den installierten Ordner registrieren.",
+      "bios": [],
+      "backup_paths": [
+        {
+          "label": "Einstellungen",
+          "root": "roamingappdata",
+          "directory": "mupen64plus/mupen64plus.cfg",
+          "type": "file"
+        },
+        {
+          "label": "Spielstände",
+          "root": "roamingappdata",
+          "directory": "mupen64plus/save",
+          "type": "directory"
+        },
+        {
+          "label": "Speicherzustände",
+          "root": "roamingappdata",
+          "directory": "mupen64plus/savestates",
+          "type": "directory"
+        }
+      ],
+      "bios_note": "Für den normalen Modulbetrieb sind keine zusätzlichen eigenen BIOS-Dateien erforderlich.",
+      "backup_note": "Standardpfade werden geprüft. Falls im Emulator andere Ordner eingestellt sind, bitte diese gezielt zuordnen. Emulator vor Sicherung oder Wiederherstellung schließen.",
+      "launch_args": [
+        "{game}"
+      ],
+      "launch_note": "Das native Konsolen-Frontend benötigt passend eingerichtete Grafik-, Audio-, Eingabe- und RSP-Plugins. Andere Frontends können andere Parameter benötigen.",
+      "controller_config": "manuell",
+      "controller_manual": "Mupen64Plus verwendet je nach Oberfläche ein anderes Eingabemenü und Plugin. In deiner Oberfläche die Eingabeeinstellungen von Input-SDL für Spieler 1 öffnen, Gamepad wählen und zuordnen. Keine automatische Plugin-Konfiguration durch den Hub."
+    },
+    "Nintendo|GameCube / Wii": {
+      "id": "dolphin",
+      "install_methode": "manuell",
+      "download_muster": "",
+      "exe": "Dolphin.exe",
+      "hinweis": "Die Windows-Version kann eine zusätzliche Visual-C++-Runtime benötigen. „Development versions“ sind weniger getestet.",
+      "install_begruendung": "Die aktuellen offiziellen Windows-Releases setzen die Visual-C++-Runtime voraus; die Voraussetzungen werden manuell geklärt.",
+      "manuelle_schritte": [
+        "Die offizielle Dolphin-Downloadseite öffnen.",
+        "Im Bereich „Releases“ den obersten Release und „Windows x64“ wählen.",
+        "Den Installer bzw. das Archiv nach den dortigen Hinweisen verwenden; den Visual-C++-Runtime-Hinweis beachten.",
+        "Dolphin.exe starten und den installierten Ordner registrieren."
+      ],
+      "todo": "TODO: Offiziellen dynamischen Release-Resolver und Runtime-Erkennung vor Automatisierung ergänzen.",
+      "bios": [],
+      "backup_paths": [
+        {
+          "label": "Einstellungen",
+          "root": "roamingappdata",
+          "directory": "Dolphin Emulator/Config",
+          "type": "directory",
+          "portable": {
+            "marker": "portable.txt",
+            "directory": "User/Config"
+          }
+        },
+        {
+          "label": "GameCube-Spielstände",
+          "root": "roamingappdata",
+          "directory": "Dolphin Emulator/GC",
+          "type": "directory",
+          "portable": {
+            "marker": "portable.txt",
+            "directory": "User/GC"
+          }
+        },
+        {
+          "label": "Speicherzustände",
+          "root": "roamingappdata",
+          "directory": "Dolphin Emulator/StateSaves",
+          "type": "directory",
+          "portable": {
+            "marker": "portable.txt",
+            "directory": "User/StateSaves"
+          }
+        }
+      ],
+      "bios_note": "Dolphin benötigt für den normalen GameCube-/Wii-Betrieb kein zusätzliches BIOS. Eine eigene NAND-Struktur kann für bestimmte Funktionen nötig sein; diese im Emulator konfigurieren.",
+      "backup_note": "Aktuelle Versionen: AppData/Roaming/Dolphin Emulator. Vorhandene portable.txt wird berücksichtigt (User neben der EXE). Ältere Builds nutzen Windows-Dokumente. Wii/title enthält auch installierte Kanäle: eigene Spielstände gezielt als jeweilige title-Unterordner/data ergänzen. Einen abweichenden User-Ordner manuell zuordnen.",
+      "launch_args": [
+        "-b",
+        "-e",
+        "{game}"
+      ],
+      "controller_config": "auto",
+      "controller_manual": "Dolphin schließen. Zuvor in Controller → GameCube-Port 1 „Standard-Controller“ wählen, Konfigurieren öffnen und speichern. Danach die aktive GCPadNew.ini im Assistenten auswählen. Automatik gilt nur für GameCube-Port 1 mit XInput-Gamepad; Wii-Fernbedienung und Erweiterungen separat in Dolphin einstellen.",
+      "controller_adapter": "dolphin_gc_xinput",
+      "controller_note": "Automatik nur fuer GameCube-Port 1 mit XInput-Gamepad und vorhandener, ausdruecklich bestaetigter aktiver Konfigdatei. Wii wird manuell eingerichtet."
+    },
+    "Nintendo|Nintendo DS": {
+      "id": "melonds",
+      "install_methode": "auto_github",
+      "github_repo": "melonDS-emu/melonDS",
+      "download_muster": "^melonDS-[0-9.]+-windows-x86_64\\.zip$",
+      "exe": "melonDS.exe",
+      "archive_type": "zip",
+      "verified_release": "1.1",
+      "verified_asset": "melonDS-1.1-windows-x86_64.zip",
+      "verified_asset_sha256": "9f3f8a244103be20b5b657af5b0ed1b2a66bb20a7181476a6d294c9a53d4f8c8",
+      "hinweis": "Portables Windows-x64-Paket; das komplette Archiv wird entpackt.",
+      "install_begruendung": "Geprüfter stabiler GitHub-Release mit eindeutigem Windows-x64-ZIP und bestätigter Startdatei.",
+      "manuelle_schritte": [
+        "Die offizielle Downloadseite öffnen.",
+        "Den aktuellen stabilen Release und das Windows-x64-ZIP wählen. ARM64-, Debug-, Symbol- und Quellcode-Pakete überspringen.",
+        "Das ganze Archiv in einen eigenen beschreibbaren Ordner entpacken.",
+        "melonDS.exe starten und mit „Ordner auswählen“ den entpackten Ordner registrieren."
+      ],
+      "bios": [
+        {
+          "label": "Eigene DS-BIOS-/Firmware-Dateien",
+          "root": "emulator",
+          "directory": ".",
+          "filenames": [
+            "bios7.bin",
+            "bios9.bin",
+            "firmware.bin"
+          ],
+          "required": false,
+          "any_of": false,
+          "note": "Moderne Versionen können im direkten DS-Modus interne Ersatzdateien nutzen. Externe Dateien nur für den entsprechenden eigenen Firmware-Betrieb erforderlich; DSi-Dateien individuell zuordnen."
+        }
+      ],
+      "backup_paths": [
+        {
+          "label": "Portable TOML-Einstellungen",
+          "root": "emulator",
+          "directory": "melonDS.toml",
+          "type": "file",
+          "portable": {
+            "marker": "portable",
+            "marker_type": "directory",
+            "directory": "portable/melonDS.toml"
+          }
+        },
+        {
+          "label": "Ältere portable INI-Einstellungen",
+          "root": "emulator",
+          "directory": "melonDS.ini",
+          "type": "file",
+          "portable": {
+            "marker": "portable",
+            "marker_type": "directory",
+            "directory": "portable/melonDS.ini"
+          }
+        },
+        {
+          "label": "Benutzer-TOML-Einstellungen",
+          "root": "roamingappdata",
+          "directory": "melonDS/melonDS.toml",
+          "type": "file",
+          "portable": {
+            "marker": "portable",
+            "marker_type": "directory",
+            "directory": "portable/melonDS.toml"
+          }
+        }
+      ],
+      "bios_note": "Aktuelle melonDS-Versionen können für den direkten DS-Spielstart interne Ersatzdaten verwenden. Die aufgeführten eigenen DS-Dateien sind optional für echten BIOS-/Firmware-Betrieb. DSi-Start benötigt weitere eigene konfigurierte Systemdateien; diese hier manuell zuordnen.",
+      "backup_note": "Aktuelle Einstellungen: AppData/Roaming/melonDS; portable/-Ordner neben der EXE hat Vorrang und wird berücksichtigt. Manche portable/ältere Builds nutzen die EXE-Umgebung. Save-Dateien neben eigenen Spielen und abweichende Save-Ordner gezielt manuell zuordnen.",
+      "launch_args": [
+        "{game}"
+      ],
+      "controller_config": "manuell",
+      "controller_manual": "melonDS öffnen → Config → Input and hotkeys. Gamepad für Spieler 1 wählen, Tasten und gegebenenfalls Touchscreen-Ersatz zuordnen und speichern."
+    },
+    "Nintendo|Nintendo 3DS": {
+      "id": "azahar",
+      "install_methode": "auto_github",
+      "github_repo": "azahar-emu/azahar",
+      "download_muster": "^azahar-windows-mxe-[0-9.]+\\.zip$",
+      "exe": "azahar.exe",
+      "archive_type": "zip",
+      "verified_release": "2126.1.2",
+      "verified_asset": "azahar-windows-mxe-2126.1.2.zip",
+      "verified_asset_sha256": "e0dcb35405e47ec49070ca1e8d26fb531417d317fbbfff154350faeef0dab90f",
+      "hinweis": "Automatisch wird das portable Windows-MXE-Paket installiert. Die zusätzliche Server- und Testanwendung sind keine Startdateien für den Hub.",
+      "install_begruendung": "Geprüfter stabiler GitHub-Release mit eindeutigem Windows-x64-ZIP und bestätigter Startdatei.",
+      "manuelle_schritte": [
+        "Die offizielle Downloadseite öffnen.",
+        "Im stabilen Release „azahar-windows-mxe-<Version>.zip“ wählen. Das Libretro-Paket enthält keinen eigenständigen Desktop-Emulator.",
+        "Das ganze Archiv in einen eigenen beschreibbaren Ordner entpacken.",
+        "azahar.exe starten und mit „Ordner auswählen“ den entpackten Ordner registrieren."
+      ],
+      "bios": [],
+      "backup_paths": [
+        {
+          "label": "Einstellungen",
+          "root": "roamingappdata",
+          "directory": "Azahar/config",
+          "type": "directory",
+          "portable": {
+            "marker": "user",
+            "marker_type": "directory",
+            "directory": "user/config"
+          }
+        },
+        {
+          "label": "Speicherzustände",
+          "root": "roamingappdata",
+          "directory": "Azahar/states",
+          "type": "directory",
+          "portable": {
+            "marker": "user",
+            "marker_type": "directory",
+            "directory": "user/states"
+          }
+        }
+      ],
+      "bios_note": "Eigene 3DS-Systemdaten werden nach Bedarf innerhalb Azahars eingerichtet. Es gibt keinen einzelnen universellen BIOS-Dateinamen; eigene konfigurierte Dateien hier zuordnen.",
+      "backup_note": "Standard: AppData/Roaming/Azahar; ein vorhandener user-Ordner neben der EXE wird berücksichtigt. Eigene Spielstände in SD-/NAND-Unterordnern hängen von Titel und Profil ab: nur den konkreten Save-Ordner manuell ergänzen, keine gesamten SD-/NAND-Spielordner.",
+      "launch_args": [
+        "{game}"
+      ],
+      "launch_note": "Azahar akzeptiert unterstützte eigene entschlüsselte 3DS-Spiel-Dateien. Dateiendung allein bestätigt weder Entschlüsselung noch Spielkompatibilität.",
+      "controller_config": "manuell",
+      "controller_manual": "Azahar öffnen → Emulation → Konfigurieren → Steuerung. Eingabegerät wählen, Tasten und Sticks zuordnen und speichern. Touchscreen bleibt gesondert einzurichten."
+    },
+    "Nintendo|Wii U": {
+      "id": "cemu",
+      "install_methode": "auto_github",
+      "github_repo": "cemu-project/Cemu",
+      "download_muster": "^cemu-[0-9.]+-windows-x64\\.zip$",
+      "exe": "Cemu.exe",
+      "archive_type": "zip",
+      "verified_release": "v2.6",
+      "verified_asset": "cemu-2.6-windows-x64.zip",
+      "verified_asset_sha256": null,
+      "hinweis": "Portables Windows-x64-Paket; das komplette Archiv wird entpackt.",
+      "install_begruendung": "Geprüfter stabiler GitHub-Release mit eindeutigem Windows-x64-ZIP und bestätigter Startdatei.",
+      "manuelle_schritte": [
+        "Die offizielle Downloadseite öffnen.",
+        "Den aktuellen stabilen Release und das Windows-x64-ZIP wählen. ARM64-, Debug-, Symbol- und Quellcode-Pakete überspringen.",
+        "Das ganze Archiv in einen eigenen beschreibbaren Ordner entpacken.",
+        "Cemu.exe starten und mit „Ordner auswählen“ den entpackten Ordner registrieren."
+      ],
+      "bios": [],
+      "backup_paths": [
+        {
+          "label": "Spielstände",
+          "root": "emulator",
+          "directory": "mlc01/usr/save",
+          "type": "directory"
+        },
+        {
+          "label": "Einstellungen",
+          "root": "emulator",
+          "directory": "settings.xml",
+          "type": "file"
+        },
+        {
+          "label": "Controllerprofile",
+          "root": "emulator",
+          "directory": "controllerProfiles",
+          "type": "directory"
+        },
+        {
+          "label": "Spielprofile",
+          "root": "emulator",
+          "directory": "gameProfiles",
+          "type": "directory"
+        }
+      ],
+      "bios_note": "Für den normalen Modulbetrieb sind keine zusätzlichen eigenen BIOS-Dateien erforderlich.",
+      "backup_note": "Gezielte portable Standardpfade neben Cemu.exe. Bei anderem MLC-/Datenpfad die eigenen Save- und Einstellungsordner wählen. mlc01/usr/title enthält Spiele und wird nicht gesichert.",
+      "launch_args": [
+        "-g",
+        "{game}"
+      ],
+      "launch_extensions": [
+        ".rpx",
+        ".wud",
+        ".wux",
+        ".wua"
+      ],
+      "launch_note": "Cemu startet eigene RPX-/WUD-/WUX-/WUA-Dateien. Eine gewöhnliche ISO ist kein unterstütztes Wii-U-Spielformat.",
+      "controller_config": "manuell",
+      "controller_manual": "Cemu öffnen → Options → Input settings. Controller 1 und emulierten Controllertyp wählen, API/Gamepad auswählen, Tasten zuordnen und ein Profil speichern."
+    },
+    "Sony|PlayStation 1": {
+      "id": "duckstation",
+      "install_methode": "manuell",
+      "download_muster": "",
+      "exe": "duckstation-qt-x64-ReleaseLTCG.exe",
+      "hinweis": "Windows 10/11 x64 verwenden. Der offizielle Download bietet Installer oder portable Version.",
+      "install_begruendung": "Der offizielle „latest“-Kanal ist ein veränderlicher Build-Kanal; Voraussetzungen und Kanalwahl werden manuell behandelt.",
+      "manuelle_schritte": [
+        "Die offizielle DuckStation-Seite öffnen und „Windows“ wählen.",
+        "Den offiziellen Windows-x64-Installer oder das portable x64-ZIP wählen.",
+        "Den Installer abschließen oder das ganze ZIP in einen eigenen Ordner entpacken.",
+        "DuckStation starten und den Ordner registrieren; die vorhandene Startdatei auswählen."
+      ],
+      "alternative_exes": [
+        "duckstation-qt-x64-Release.exe",
+        "duckstation-qt.exe"
+      ],
+      "todo": "TODO: Build-Kanal und aktuelle Startdatei erneut prüfen, bevor automatische Updates angeboten werden.",
+      "bios": [
+        {
+          "label": "Eigenes regionales PlayStation-BIOS",
+          "root": "localappdata",
+          "directory": "DuckStation/bios",
+          "filenames": [
+            "scph5500.bin",
+            "scph5501.bin",
+            "scph5502.bin"
+          ],
+          "required": true,
+          "any_of": true,
+          "note": "Diese gängigen Namen sind Beispiele für regionale eigene Dumps. Andere Dateinamen und eigene BIOS-Pfade bitte direkt zuordnen; Region muss zum Spiel passen.",
+          "portable": {
+            "marker": "portable.txt",
+            "directory": "bios"
+          }
+        }
+      ],
+      "backup_paths": [
+        {
+          "label": "Memory Cards",
+          "root": "localappdata",
+          "directory": "DuckStation/memcards",
+          "type": "directory",
+          "portable": {
+            "marker": "portable.txt",
+            "directory": "memcards"
+          }
+        },
+        {
+          "label": "Speicherzustände",
+          "root": "localappdata",
+          "directory": "DuckStation/savestates",
+          "type": "directory",
+          "portable": {
+            "marker": "portable.txt",
+            "directory": "savestates"
+          }
+        },
+        {
+          "label": "Einstellungen",
+          "root": "localappdata",
+          "directory": "DuckStation/settings.ini",
+          "type": "file",
+          "portable": {
+            "marker": "portable.txt",
+            "directory": "settings.ini"
+          }
+        },
+        {
+          "label": "Spielprofile",
+          "root": "localappdata",
+          "directory": "DuckStation/gamesettings",
+          "type": "directory",
+          "portable": {
+            "marker": "portable.txt",
+            "directory": "gamesettings"
+          }
+        }
+      ],
+      "bios_note": "DuckStation benötigt ein eigenes passendes PlayStation-BIOS. Die aufgeführten regionalen Dateinamen sind Alternativen; welche Region zum Spiel passt, muss im Emulator eingestellt werden. Eigene abweichend benannte Dateien hier manuell zuordnen.",
+      "backup_note": "Aktuelle Windows-Versionen: LocalAppData/DuckStation. Eine bereits vorhandene portable.txt neben der EXE wird berücksichtigt. Ältere Versionen nutzten Documents/DuckStation; abweichende eigene Save-/Einstellungspfade gezielt zuordnen.",
+      "launch_args": [
+        "--",
+        "{game}"
+      ],
+      "controller_config": "manuell",
+      "controller_manual": "DuckStation öffnen → Einstellungen → Controller. Globales Profil oder Spielprofil und Port 1 wählen, Gamepad automatisch im Emulator zuordnen oder die Tasten einzeln setzen und speichern."
+    },
+    "Sony|PlayStation 2": {
+      "id": "pcsx2",
+      "install_methode": "manuell",
+      "download_muster": "",
+      "exe": "pcsx2-qt.exe",
+      "hinweis": "Eine Nightly nur bewusst wählen; die stabile Version ist die Voreinstellung der Anleitung.",
+      "install_begruendung": "Stabiles 7z/Installer-Paket mit zusätzlichen Windows-Runtime-Voraussetzungen; startfertige unbeaufsichtigte Einrichtung nicht bestätigt.",
+      "manuelle_schritte": [
+        "Die offizielle PCSX2-Downloadseite öffnen.",
+        "Die aktuelle stabile Windows-x64-Version wählen.",
+        "Den Installer verwenden oder das ganze portable 7z entpacken. Die offiziellen Setup-Voraussetzungen beachten.",
+        "pcsx2-qt.exe starten und den installierten Ordner registrieren."
+      ],
+      "todo": "TODO: Aktuelles 7z und Runtime-Voraussetzungen auf einer sauberen Windows-Installation verifizieren.",
+      "bios": [],
+      "backup_paths": [
+        {
+          "label": "Memory Cards",
+          "root": "documents",
+          "directory": "PCSX2/memcards",
+          "type": "directory",
+          "portable": {
+            "markers": [
+              "portable.txt",
+              "portable.ini"
+            ],
+            "directory": "memcards",
+            "path_from_marker": true
+          }
+        },
+        {
+          "label": "Speicherzustände",
+          "root": "documents",
+          "directory": "PCSX2/sstates",
+          "type": "directory",
+          "portable": {
+            "markers": [
+              "portable.txt",
+              "portable.ini"
+            ],
+            "directory": "sstates",
+            "path_from_marker": true
+          }
+        },
+        {
+          "label": "Einstellungen",
+          "root": "documents",
+          "directory": "PCSX2/inis",
+          "type": "directory",
+          "portable": {
+            "markers": [
+              "portable.txt",
+              "portable.ini"
+            ],
+            "directory": "inis",
+            "path_from_marker": true
+          }
+        }
+      ],
+      "bios_note": "PCSX2 benötigt den eigenen PS2-BIOS-Dump. Der Dateiname hängt von Konsole und Dump ab. Eigene Dateien im unter Einstellungen gewählten BIOS-Ordner ablegen und hier einzeln zuordnen.",
+      "backup_note": "Standard: Windows-Dokumente/PCSX2. Vorhandene portable.txt/portable.ini neben der EXE werden berücksichtigt; ein Profilpfad im Inhalt von portable.txt hat Vorrang. Abweichende selbst konfigurierte Save-/Einstellungspfade gezielt zuordnen.",
+      "launch_args": [
+        "--",
+        "{game}"
+      ],
+      "controller_config": "manuell",
+      "controller_manual": "PCSX2 öffnen → Einstellungen → Controller. Eingabequelle aktivieren, Controller-Port 1 wählen und im Emulator automatisch zuordnen oder jede Taste setzen. Spielprofile können globale Einstellungen übersteuern."
+    },
+    "Sony|PlayStation 3": {
+      "id": "rpcs3",
+      "install_methode": "manuell",
+      "download_muster": "",
+      "exe": "rpcs3.exe",
+      "hinweis": "Die offizielle Prüfsumme gehört zum jeweils auf der Downloadseite angebotenen Build.",
+      "install_begruendung": "Fortlaufende Builds mit dynamischem Archiv und SHA-256 auf der Downloadseite; kein verifizierter stabiler API-Resolver.",
+      "manuelle_schritte": [
+        "Die offizielle RPCS3-Downloadseite öffnen.",
+        "Die Windows-Plattformkarte und die aktuelle Datei wählen.",
+        "Die dortige SHA-256-Prüfsumme mit der geladenen Datei vergleichen.",
+        "Das ganze Archiv entpacken, rpcs3.exe starten und den Ordner registrieren."
+      ],
+      "todo": "TODO: Offiziellen Build-Resolver einschließlich dynamischer SHA-256-Prüfsumme ergänzen; keine URL-Muster raten.",
+      "bios": [],
+      "backup_paths": [
+        {
+          "label": "Benutzerspielstände",
+          "root": "emulator",
+          "directory": "dev_hdd0/home",
+          "type": "directory"
+        },
+        {
+          "label": "Haupteinstellungen",
+          "root": "emulator",
+          "directory": "config.yml",
+          "type": "file"
+        },
+        {
+          "label": "Eigene Spielkonfigurationen",
+          "root": "emulator",
+          "directory": "config",
+          "type": "directory"
+        },
+        {
+          "label": "GUI-Einstellungen",
+          "root": "emulator",
+          "directory": "GuiConfigs",
+          "type": "directory"
+        }
+      ],
+      "bios_note": "RPCS3 benötigt die eigene korrekt installierte PS3-Firmware-Struktur in dev_flash. Einzelne vorhandene Dateien bestätigen keine vollständige Installation. Firmware im Emulator mit der eigenen Datei einrichten; gewünschte lokale Dateien hier zuordnen.",
+      "backup_note": "Portable Windows-Standardpfade. dev_hdd0/home enthält Benutzerdaten und Spielstände; installierte Spiele unter dev_hdd0/game und Disc-Spiele werden nicht gesichert. Bei eigenem VFS Pfade anpassen.",
+      "launch_args": [
+        "--no-gui",
+        "{game}"
+      ],
+      "launch_extensions": [
+        ".bin",
+        ".elf",
+        ".self"
+      ],
+      "launch_note": "RPCS3 benötigt das eigene entpackte Spiel und dessen EBOOT.BIN, ELF oder SELF. Eine ISO lässt sich nicht direkt starten.",
+      "controller_config": "manuell",
+      "controller_manual": "RPCS3 öffnen → Pads. Für Spieler 1 den passenden Handler (z. B. XInput) und Controller wählen, Tasten testen und das Profil speichern. Spielbezogene Pad-Profile gesondert prüfen."
+    },
+    "Sony|PSP": {
+      "id": "ppsspp",
+      "install_methode": "auto_github",
+      "github_repo": "hrydgard/ppsspp",
+      "download_muster": "^PPSSPP-v[0-9.]+-Windows-x64\\.zip$",
+      "exe": "PPSSPPWindows64.exe",
+      "archive_type": "zip",
+      "verified_release": "v1.20.4",
+      "verified_asset": "PPSSPP-v1.20.4-Windows-x64.zip",
+      "verified_asset_sha256": "fbc9cd2f5131b159a92424e5c458c35ce43ba603cdded64dfc98e4bd4f17ff93",
+      "hinweis": "Portables Windows-x64-Paket; das komplette Archiv wird entpackt.",
+      "install_begruendung": "Geprüfter stabiler GitHub-Release mit eindeutigem Windows-x64-ZIP und bestätigter Startdatei.",
+      "manuelle_schritte": [
+        "Die offizielle Downloadseite öffnen.",
+        "Den aktuellen stabilen Release und das Windows-x64-ZIP wählen. ARM64-, Debug-, Symbol- und Quellcode-Pakete überspringen.",
+        "Das ganze Archiv in einen eigenen beschreibbaren Ordner entpacken.",
+        "PPSSPPWindows64.exe starten und mit „Ordner auswählen“ den entpackten Ordner registrieren."
+      ],
+      "bios": [],
+      "backup_paths": [
+        {
+          "label": "PSP-Spielstände",
+          "root": "emulator",
+          "directory": "memstick/PSP/SAVEDATA",
+          "type": "directory"
+        },
+        {
+          "label": "Speicherzustände",
+          "root": "emulator",
+          "directory": "memstick/PSP/PPSSPP_STATE",
+          "type": "directory"
+        },
+        {
+          "label": "Einstellungen",
+          "root": "emulator",
+          "directory": "memstick/PSP/SYSTEM",
+          "type": "directory"
+        }
+      ],
+      "bios_note": "Für den normalen Modulbetrieb sind keine zusätzlichen eigenen BIOS-Dateien erforderlich.",
+      "backup_note": "ZIP-Version: memstick neben PPSSPPWindows64.exe. installed.txt kann den Speicherort nach Dokumente/PPSSPP oder einen eigenen Pfad umleiten. Dann die gezielten Unterordner selbst zuordnen; PSP/GAME wird nicht gesichert.",
+      "launch_args": [
+        "{game}"
+      ],
+      "controller_config": "manuell",
+      "controller_manual": "PPSSPP öffnen → Einstellungen → Steuerung → Tastenbelegung. Gamepad-Tasten und Analogstick zuordnen. Änderungen werden von PPSSPP gespeichert."
+    },
+    "Sony|PS Vita": {
+      "id": "vita3k",
+      "install_methode": "manuell",
+      "download_muster": "",
+      "exe": "Vita3K.exe",
+      "hinweis": "Die offizielle Downloadseite verwendet ausdrücklich Nightlies; diese sind keine stabilen Releases.",
+      "install_begruendung": "Das Projekt veröffentlicht Nightlies statt stabiler Releases; bewusste manuelle Build-Auswahl.",
+      "manuelle_schritte": [
+        "Die offizielle Vita3K-Downloadseite öffnen.",
+        "Unter „Windows Nightlies“ den x64-Build wählen.",
+        "Das ganze Archiv entpacken und die offiziellen Plattformhinweise beachten.",
+        "Vita3K.exe starten und den Ordner registrieren."
+      ],
+      "todo": "TODO: Nightly-Versionierung und Startdatei erneut prüfen, bevor automatische Updates angeboten werden.",
+      "bios": [],
+      "backup_paths": [
+        {
+          "label": "Portable Einstellungen",
+          "root": "emulator",
+          "directory": "config.yml",
+          "type": "file"
+        }
+      ],
+      "bios_note": "Vita3K benötigt eigene installierte Firmware-Komponenten in seiner emulierten Systemstruktur. Es gibt keinen universellen einzelnen BIOS-Dateinamen; eigene Dateien im Emulator einrichten und hier gezielt zuordnen.",
+      "backup_note": "Der emulierte Speicherort wird in Vita3K festgelegt. Für Spielstände ausschließlich den eigenen ux0/user/<Benutzer>/savedata-Ordner sowie gezielte Einstellungen zuordnen, nicht ux0/app mit Spielen.",
+      "launch_args": [
+        "{game}"
+      ],
+      "launch_extensions": [
+        ".vpk",
+        ".zip"
+      ],
+      "launch_note": "Eigene VPK-/ZIP-Spielpakete werden von Vita3K gegebenenfalls zuerst in seinen eigenen emulierten Speicher installiert und dann gestartet. Die Bibliothek selbst verändert die Ausgangsdatei nicht.",
+      "controller_config": "manuell",
+      "controller_manual": "Vita3K öffnen und in den Einstellungen den Bereich für Controller/Eingabe wählen. Gamepad und Tasten zuordnen; Touch- und Rückseitenfunktionen gesondert einstellen. Der genaue Menüname hängt von der Version ab."
+    },
+    "Sega|Master System / Mega Drive": {
+      "id": "blastem-genesis-plus-gx",
+      "install_methode": "manuell",
+      "download_muster": "",
+      "exe": "blastem.exe",
+      "hinweis": "Genesis Plus GX benötigt ein Frontend wie RetroArch. Der alte Tabellen-Link wurde durch die funktionierende offizielle BlastEm-Seite ersetzt.",
+      "install_begruendung": "BlastEm ist ein Programm, Genesis Plus GX ein Core; deshalb bewusste manuelle Auswahl.",
+      "manuelle_schritte": [
+        "Die offizielle BlastEm-Downloadseite öffnen.",
+        "Unter „Stable Release“ das „64-bit Windows“-Paket wählen und ganz entpacken.",
+        "blastem.exe starten und den Ordner registrieren.",
+        "Für Genesis Plus GX alternativ RetroArch von https://www.retroarch.com/ installieren.",
+        "In RetroArch „Hauptmenü → Online Updater → Core Downloader → Sega - MS/GG/MD/CD (Genesis Plus GX)“ wählen.",
+        "Bei RetroArch dessen Ordner registrieren und retroarch.exe als Startdatei auswählen."
+      ],
+      "official_url": "https://www.retrodev.com/blastem/downloads.html",
+      "alternative_exes": [
+        "retroarch.exe"
+      ],
+      "bios": [],
+      "backup_paths": [
+        {
+          "label": "Portable BlastEm-Einstellungen",
+          "root": "emulator",
+          "directory": "blastem.cfg",
+          "type": "file"
+        }
+      ],
+      "bios_note": "Für den normalen Modulbetrieb sind keine zusätzlichen eigenen BIOS-Dateien erforderlich.",
+      "backup_note": "BlastEm-Save-Pfade sind über blastem.cfg konfigurierbar und vom Build abhängig. Eigene gezielte Save-/State-Ordner ergänzen. RetroArch besitzt eigene Datenpfade.",
+      "launch_profiles": {
+        "blastem.exe": [
+          "{game}"
+        ],
+        "retroarch.exe": null
+      },
+      "launch_note": "BlastEm startet den Spielpfad direkt. Für Genesis Plus GX in RetroArch muss zuerst der tatsächlich vorhandene Core samt -L-Pfad als launch_profiles in catalog.json eingerichtet werden.",
+      "controller_config": "manuell",
+      "controller_manual": "BlastEm: Eingabeeinstellungen in der verwendeten Oberfläche öffnen und das Gamepad zuordnen. Genesis Plus GX ist ein Core: Controller in der verwendeten Host-Anwendung (z. B. RetroArch) konfigurieren. Daher keine gemeinsame automatische Konfigdatei."
+    },
+    "Sega|Saturn": {
+      "id": "mednafen-saturn",
+      "install_methode": "manuell",
+      "download_muster": "",
+      "exe": "mednafen.exe",
+      "hinweis": "Mednafen benötigt beim Start passende Argumente. Yaba Sanshiro auf Android lässt sich nicht als Windows-Programm starten.",
+      "install_begruendung": "Mednafen ist kommandozeilenorientiert; Yaba Sanshiro bleibt die genannte Android-Alternative.",
+      "manuelle_schritte": [
+        "Die offizielle Mednafen-Releases-Seite öffnen.",
+        "Das aktuelle stabile „64-bit Windows“-ZIP ganz entpacken.",
+        "Die Kommandozeilen-Dokumentation lesen; ein Doppelklick konfiguriert das Programm nicht.",
+        "Den Ordner mit mednafen.exe registrieren.",
+        "Die Android-Alternative ist auf https://www.yabasanshiro.com/download beschrieben."
+      ],
+      "bios": [
+        {
+          "label": "Eigenes japanisches Saturn-BIOS",
+          "root": "emulator",
+          "directory": "firmware",
+          "filenames": [
+            "sega_101.bin"
+          ],
+          "required": false,
+          "any_of": false,
+          "note": "Für Spiele aus Japan."
+        },
+        {
+          "label": "Eigenes europäisches/US-Saturn-BIOS",
+          "root": "emulator",
+          "directory": "firmware",
+          "filenames": [
+            "mpr-17933.bin"
+          ],
+          "required": false,
+          "any_of": false,
+          "note": "Für Spiele aus Europa/Nordamerika; mindestens das für die Spielregion passende BIOS ist erforderlich."
+        }
+      ],
+      "backup_paths": [
+        {
+          "label": "Spielstände",
+          "root": "emulator",
+          "directory": "sav",
+          "type": "directory"
+        },
+        {
+          "label": "Speicherzustände",
+          "root": "emulator",
+          "directory": "mcs",
+          "type": "directory"
+        },
+        {
+          "label": "Einstellungen",
+          "root": "emulator",
+          "directory": "mednafen.cfg",
+          "type": "file"
+        },
+        {
+          "label": "Eigene Spielprofile",
+          "root": "emulator",
+          "directory": "pgconfig",
+          "type": "directory"
+        }
+      ],
+      "bios_note": "Saturn-Spiele benötigen das eigene zur Spielregion passende BIOS. Die beiden regionalen Prüfungen zeigen Alternativen: mindestens die für das Spiel benötigte Region muss vorhanden sein.",
+      "backup_note": "Windows-Standardpfade in der EXE-Umgebung. MEDNAFEN_HOME und filesys.path_*-Einstellungen können diese umleiten; eigene gezielte Pfade entsprechend zuordnen.",
+      "launch_args": [
+        "-force_module",
+        "ss",
+        "{game}"
+      ],
+      "controller_config": "manuell",
+      "controller_manual": "Mednafen mit einem eigenen Spiel starten und Alt+Shift+1 für die interaktive Zuordnung von Port 1 verwenden; jede angeforderte Richtung/Taste betätigen. Mednafen speichert die Belegung selbst. Bei Yaba Sanshiro die Controller-Einstellungen der jeweiligen Oberfläche verwenden."
+    },
+    "Sega|Dreamcast": {
+      "id": "flycast",
+      "install_methode": "auto_github",
+      "github_repo": "flyinghead/flycast",
+      "download_muster": "^flycast-win64-[0-9.]+\\.zip$",
+      "exe": "flycast.exe",
+      "archive_type": "zip",
+      "verified_release": "v2.7",
+      "verified_asset": "flycast-win64-2.7.zip",
+      "verified_asset_sha256": "7edf489ba6b3053703a18ce8233767eb71a2d89e4bda0421b312c2167a739161",
+      "hinweis": "Portables Windows-x64-Paket; das komplette Archiv wird entpackt.",
+      "install_begruendung": "Geprüfter stabiler GitHub-Release mit eindeutigem Windows-x64-ZIP und bestätigter Startdatei.",
+      "manuelle_schritte": [
+        "Die offizielle Downloadseite öffnen.",
+        "Den aktuellen stabilen Release und das Windows-x64-ZIP wählen. ARM64-, Debug-, Symbol- und Quellcode-Pakete überspringen.",
+        "Das ganze Archiv in einen eigenen beschreibbaren Ordner entpacken.",
+        "flycast.exe starten und mit „Ordner auswählen“ den entpackten Ordner registrieren."
+      ],
+      "bios": [
+        {
+          "label": "Eigenes Dreamcast-BIOS",
+          "root": "emulator",
+          "directory": "data",
+          "filenames": [
+            "dc_boot.bin"
+          ],
+          "required": false,
+          "any_of": false,
+          "note": ""
+        },
+        {
+          "label": "Eigener Dreamcast-Flash",
+          "root": "emulator",
+          "directory": "data",
+          "filenames": [
+            "dc_flash.bin"
+          ],
+          "required": false,
+          "any_of": false,
+          "note": ""
+        }
+      ],
+      "backup_paths": [
+        {
+          "label": "Einstellungen",
+          "root": "emulator",
+          "directory": "emu.cfg",
+          "type": "file"
+        },
+        {
+          "label": "VMU und eigene Zustände",
+          "root": "emulator",
+          "directory": "data",
+          "type": "directory"
+        },
+        {
+          "label": "Controllerprofile",
+          "root": "emulator",
+          "directory": "mappings",
+          "type": "directory"
+        }
+      ],
+      "bios_note": "Für Dreamcast kann je nach Einstellung ein interner BIOS-Ersatz verwendet werden. Eigene BIOS-/Flash-Dateien sind optional bzw. für echten BIOS-Betrieb nötig; Arcade-Varianten haben eigene Anforderungen.",
+      "backup_note": "Portable Windows-Standardpfade. data enthält VMU/Speicherzustände und kann auch eigene Firmware enthalten. Bei anderem Flycast-Datenordner gezielte eigene Pfade zuordnen.",
+      "launch_args": [
+        "{game}"
+      ],
+      "controller_config": "manuell",
+      "controller_manual": "Flycast öffnen → Settings → Controls. Gamepad und Port A auswählen, Map öffnen und Tasten zuordnen. Spezielle Spiel- oder Arcade-Belegungen bei Bedarf separat anpassen."
+    },
+    "Microsoft|Xbox (Original)": {
+      "id": "xemu",
+      "install_methode": "auto_github",
+      "github_repo": "xemu-project/xemu",
+      "download_muster": "^xemu-[0-9.]+-windows-x86_64\\.zip$",
+      "exe": "xemu.exe",
+      "archive_type": "zip",
+      "verified_release": "v0.8.136",
+      "verified_asset": "xemu-0.8.136-windows-x86_64.zip",
+      "verified_asset_sha256": "b25a6c24a2c2c36a0843a153cd9ee59ca6833ef87bdcd855ba0824930e4ddd1d",
+      "hinweis": "Automatisch wird das versionierte Windows-x86_64-Paket verwendet, damit die zusätzliche Alias-Datei keine Mehrdeutigkeit verursacht.",
+      "install_begruendung": "Geprüfter stabiler GitHub-Release mit eindeutigem Windows-x64-ZIP und bestätigter Startdatei.",
+      "manuelle_schritte": [
+        "Die offizielle Downloadseite öffnen.",
+        "Den aktuellen stabilen Release und das Windows-x64-ZIP wählen. ARM64-, Debug-, Symbol- und Quellcode-Pakete überspringen.",
+        "Das ganze Archiv in einen eigenen beschreibbaren Ordner entpacken.",
+        "xemu.exe starten und mit „Ordner auswählen“ den entpackten Ordner registrieren."
+      ],
+      "bios": [],
+      "backup_paths": [
+        {
+          "label": "Benutzereinstellungen",
+          "root": "roamingappdata",
+          "directory": "xemu/xemu/xemu.toml",
+          "type": "file",
+          "portable": {
+            "marker": "xemu.toml",
+            "directory": "xemu.toml"
+          }
+        },
+        {
+          "label": "Portable Einstellungen",
+          "root": "emulator",
+          "directory": "xemu.toml",
+          "type": "file"
+        }
+      ],
+      "bios_note": "xemu benötigt eigene MCPX-/Flash-ROM-Dateien und ein eigenes HDD-Abbild. Alle Pfade sind in xemu frei konfigurierbar; es gibt keinen verpflichtenden Dateinamen. Die tatsächlich eingestellten eigenen Dateien hier zuordnen.",
+      "backup_note": "xemu.toml liegt standardmäßig in AppData/Roaming/xemu/xemu oder portabel neben der EXE. Spielstände liegen im eigenen HDD-Abbild: diese konkrete Datei manuell zuordnen (4-GB-Sicherungsgrenze beachten). Keine Firmware/HDD-Abbilder werden angelegt oder heruntergeladen.",
+      "launch_args": [
+        "-dvd_path",
+        "{game}"
+      ],
+      "launch_extensions": [
+        ".iso"
+      ],
+      "launch_note": "xemu benötigt ein eigenes Xbox-XISO-Abbild; eine beliebige normale ISO wird nicht automatisch konvertiert.",
+      "controller_config": "manuell",
+      "controller_manual": "xemu öffnen → Input. Für Port 1 das angeschlossene Gamepad auswählen. Falls der Controller nicht angeboten wird, den passenden Treiber bzw. einen XInput-kompatiblen Modus verwenden."
+    },
+    "Microsoft|Xbox 360": {
+      "id": "xenia-canary",
+      "official_url": "https://github.com/xenia-canary/xenia-canary/releases",
+      "install_methode": "manuell",
+      "download_muster": "",
+      "exe": "xenia_canary.exe",
+      "hinweis": "Ausschließlich den auf der offiziellen Downloadseite verlinkten Canary-Kanal verwenden. Dieser ist experimentell.",
+      "install_begruendung": "Nur der offizielle Canary-Kanal wird verwendet; er bietet experimentelle Builds statt stabiler Releases.",
+      "manuelle_schritte": [
+        "Die offizielle Xenia-Canary-Releases-Seite öffnen und den Quickstart des Projekts lesen.",
+        "Im aktuellen Canary-Release das Windows-x64-Paket wählen.",
+        "Das offizielle Windows-Canary-Archiv herunterladen und ganz entpacken.",
+        "xenia_canary.exe starten und den Ordner registrieren."
+      ],
+      "todo": "TODO: Canary-Builds brauchen einen eigenen Update-Resolver; den stabilen GitHub-Resolver nicht verwenden.",
+      "bios": [],
+      "backup_paths": [
+        {
+          "label": "Canary-Einstellungen",
+          "root": "emulator",
+          "directory": "xenia-canary.config.toml",
+          "type": "file"
+        }
+      ],
+      "bios_note": "Xenia Canary benötigt für den üblichen Spielstart kein zusätzliches BIOS.",
+      "backup_note": "Aktuelle Canary-Windows-Builds arbeiten standardmäßig portabel. Der content-Ordner enthält auch installierte Spiele/Inhalte und wird nicht pauschal gesichert. Eigene gezielte Spielstand-Unterordner ergänzen; storage_root/content_root-Einstellungen können die Pfade ändern.",
+      "launch_args": [
+        "{game}"
+      ],
+      "launch_extensions": [
+        ".iso",
+        ".xex"
+      ],
+      "launch_note": "Xenia startet unterstützte eigene Xbox-360-ISO-/XEX-Dateien. Kompatibilität hängt stark vom Spiel und dem Canary-Build ab.",
+      "controller_config": "manuell",
+      "controller_manual": "Xenia verwendet unter Windows vor allem XInput-kompatible Controller. Gamepad anschließen, den XInput-Modus des Geräts aktivieren und im Spiel testen. Der Hub ändert keine buildabhängigen Xenia-Konfigurationen."
+    },
+    "Atari|Atari 2600": {
+      "id": "stella",
+      "install_methode": "manuell",
+      "download_muster": "",
+      "exe": "Stella.exe",
+      "hinweis": "Die Windows-Version kann eine zusätzliche Visual-C++-Runtime benötigen.",
+      "install_begruendung": "Portables Windows-x64-ZIP bestätigt; die offizielle Seite verlangt gegebenenfalls eine manuell installierte Visual-C++-Runtime.",
+      "manuelle_schritte": [
+        "Die offizielle Stella-Downloadseite öffnen.",
+        "Unter „Latest Release“ das Windows-x64-ZIP oder den x64-Installer wählen.",
+        "Das ganze Archiv entpacken oder den Installer abschließen. Den offiziellen Visual-C++-Runtime-Hinweis beachten.",
+        "Stella.exe starten und den installierten Ordner registrieren."
+      ],
+      "todo": "TODO: Runtime-Erkennung vor vollständiger automatischer Installation ergänzen.",
+      "bios": [],
+      "backup_paths": [
+        {
+          "label": "Einstellungen",
+          "root": "roamingappdata",
+          "directory": "Stella/stella.sqlite3",
+          "type": "file"
+        },
+        {
+          "label": "SQLite-Zusatzdatei",
+          "root": "roamingappdata",
+          "directory": "Stella/stella.sqlite3-wal",
+          "type": "file"
+        },
+        {
+          "label": "EEPROM-Spielstände",
+          "root": "roamingappdata",
+          "directory": "Stella/nvram",
+          "type": "directory"
+        },
+        {
+          "label": "Speicherzustände",
+          "root": "roamingappdata",
+          "directory": "Stella/state",
+          "type": "directory"
+        }
+      ],
+      "bios_note": "Für den normalen Modulbetrieb sind keine zusätzlichen eigenen BIOS-Dateien erforderlich.",
+      "backup_note": "Standarddaten in AppData/Roaming/Stella. Bei -basedir/-baseinappdir eigene gezielte Pfade wählen. Stella vor Sicherung/Wiederherstellung schließen, damit die SQLite-Datenbank konsistent ist.",
+      "launch_args": [
+        "{game}"
+      ],
+      "controller_config": "manuell",
+      "controller_manual": "Stella öffnen → Options → Input Settings. Joystick für Spieler 1 und Tasten zuordnen; Paddles und andere Controllertypen benötigen eine eigene Zuordnung."
+    },
+    "NEC|PC Engine / TurboGrafx": {
+      "id": "mednafen-pcengine",
+      "install_methode": "manuell",
+      "download_muster": "",
+      "exe": "mednafen.exe",
+      "hinweis": "Derselbe Mednafen-Download wie bei Saturn. Eine vorhandene Installation kann für beide Einträge registriert werden; der Start benötigt passende Argumente.",
+      "install_begruendung": "Kommandozeilenorientiert; automatische Installation würde keine startfertige GUI herstellen.",
+      "manuelle_schritte": [
+        "Die offizielle Mednafen-Releases-Seite öffnen.",
+        "Das aktuelle stabile „64-bit Windows“-ZIP ganz entpacken.",
+        "Die mitgelieferte Kommandozeilen-Dokumentation lesen.",
+        "Den Ordner mit mednafen.exe registrieren."
+      ],
+      "bios": [
+        {
+          "label": "Eigene PC-Engine-CD-Systemkarte",
+          "root": "emulator",
+          "directory": "firmware",
+          "filenames": [
+            "syscard3.pce"
+          ],
+          "required": false,
+          "any_of": false,
+          "note": "Nur für PC-Engine-CD-Spiele erforderlich, nicht für HuCard-Spiele."
+        }
+      ],
+      "backup_paths": [
+        {
+          "label": "Spielstände",
+          "root": "emulator",
+          "directory": "sav",
+          "type": "directory"
+        },
+        {
+          "label": "Speicherzustände",
+          "root": "emulator",
+          "directory": "mcs",
+          "type": "directory"
+        },
+        {
+          "label": "Einstellungen",
+          "root": "emulator",
+          "directory": "mednafen.cfg",
+          "type": "file"
+        },
+        {
+          "label": "Eigene Spielprofile",
+          "root": "emulator",
+          "directory": "pgconfig",
+          "type": "directory"
+        }
+      ],
+      "bios_note": "HuCard-Spiele benötigen keine zusätzliche Systemkarte. Für PC-Engine-CD-Spiele ist die eigene passende Systemkarten-Datei erforderlich; der Katalog prüft syscard3.pce am Standardpfad.",
+      "backup_note": "Standardpfade werden geprüft. Falls im Emulator andere Ordner eingestellt sind, bitte diese gezielt zuordnen. Emulator vor Sicherung oder Wiederherstellung schließen.",
+      "launch_args": [
+        "-force_module",
+        "pce",
+        "{game}"
+      ],
+      "controller_config": "manuell",
+      "controller_manual": "Mednafen mit einem eigenen Spiel starten und Alt+Shift+1 für die interaktive Zuordnung von Port 1 verwenden; jede angeforderte Richtung/Taste betätigen. Mednafen speichert die Belegung selbst."
+    },
+    "SNK / Arcade|Neo Geo / Arcade": {
+      "id": "finalburn-neo-mame",
+      "install_methode": "manuell",
+      "download_muster": "",
+      "exe": "fbneo64.exe",
+      "hinweis": "FinalBurn Neo und MAME sind Alternativen. Den Kanal und das Paket auf der offiziellen Projektseite prüfen.",
+      "install_begruendung": "Der neueste FinalBurn-Neo-Kanal bietet Nightlies; MAME ist eine eigene alternative Paketwahl.",
+      "manuelle_schritte": [
+        "Die offizielle FinalBurn-Neo-Releases-Seite öffnen.",
+        "Den Windows-x86_64-Build bewusst auswählen; der aktuelle Kanal kann ein Nightly sein.",
+        "Das ganze Archiv entpacken und FinalBurn Neo starten.",
+        "Alternativ https://www.mamedev.org/release.html öffnen und dort das aktuelle Windows-x64-Paket wählen.",
+        "Den Ordner registrieren und die tatsächlich vorhandene Startdatei auswählen."
+      ],
+      "alternative_exes": [
+        "fbneo.exe",
+        "fba64.exe",
+        "fba.exe",
+        "mame.exe"
+      ],
+      "todo": "TODO: Versionierte stabile FinalBurn-Neo-Assets bzw. MAME-Archivweg vor Automatisierung verifizieren.",
+      "bios": [],
+      "backup_paths": [
+        {
+          "label": "NVRAM-Spielstände",
+          "root": "emulator",
+          "directory": "nvram",
+          "type": "directory"
+        },
+        {
+          "label": "Konfigurationen",
+          "root": "emulator",
+          "directory": "config",
+          "type": "directory"
+        },
+        {
+          "label": "MAME-Konfigurationen",
+          "root": "emulator",
+          "directory": "cfg",
+          "type": "directory"
+        },
+        {
+          "label": "Speicherzustände",
+          "root": "emulator",
+          "directory": "sta",
+          "type": "directory"
+        }
+      ],
+      "bios_note": "Neo-Geo und manche Arcade-Systeme benötigen eigene systemabhängige BIOS-Bestandteile im selbst konfigurierten Suchordner. Namen/Umfang hängen vom gewählten Core und System ab; eigene tatsächlich benötigte Dateien hier zuordnen.",
+      "backup_note": "Standardpfade werden geprüft. Falls im Emulator andere Ordner eingestellt sind, bitte diese gezielt zuordnen. Emulator vor Sicherung oder Wiederherstellung schließen.",
+      "launch_profiles": {
+        "fbneo64.exe": [
+          "{game_stem}",
+          "-w"
+        ],
+        "fbneo.exe": [
+          "{game_stem}",
+          "-w"
+        ],
+        "fba64.exe": [
+          "{game_stem}",
+          "-w"
+        ],
+        "fba.exe": [
+          "{game_stem}",
+          "-w"
+        ],
+        "mame.exe": [
+          "-rompath",
+          "{game_dir}",
+          "{game_stem}"
+        ]
+      },
+      "launch_extensions": [
+        ".zip"
+      ],
+      "launch_note": "ZIP-Dateien müssen den vom Emulator erwarteten Set-Namen behalten. MAME erhält den eigenen Ordner als -rompath. In FinalBurn Neo den Ordner mit eigenen ZIP-Dateien zuerst in den Emulator-Einstellungen als Suchpfad einrichten; benötigt wird der passende vollständige eigene Set.",
+      "controller_config": "manuell",
+      "controller_manual": "FinalBurn Neo: Input → Map game inputs öffnen und Tasten für das laufende Spiel setzen. MAME: Tab → Eingabeeinstellungen öffnen und allgemeine oder spielbezogene Eingabe zuordnen. Standalone-Programme und Cores verwenden unterschiedliche Formate."
+    }
+  }
+}

@@ -1,0 +1,77 @@
+name: Windows-Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*.[0-9]*.[0-9]*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Projekt auschecken
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+      - name: Python 3.12 einrichten
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          architecture: x64
+          cache: pip
+          cache-dependency-path: requirements.lock.txt
+      - name: Tag mit Programmversion vergleichen
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          $version = python -c "from core.version import VERSION; print(VERSION)"
+          if ($LASTEXITCODE -ne 0 -or $version -notmatch '^\d+\.\d+\.\d+$') { throw 'Ungültige Programmversion.' }
+          if ($env:RELEASE_TAG -cne "v$version") { throw 'Der Tag muss exakt zur Version in core/version.py passen.' }
+      - name: Abhängigkeiten installieren
+        run: |
+          python -m venv .venv
+          & .\.venv\Scripts\python.exe -m pip install -r requirements.lock.txt
+          if ($LASTEXITCODE -ne 0) { throw 'Abhängigkeiten konnten nicht installiert werden.' }
+          & .\.venv\Scripts\python.exe -m pip check
+          if ($LASTEXITCODE -ne 0) { throw 'Abhängigkeiten sind nicht konsistent.' }
+      - name: Dateien vor Veröffentlichung prüfen
+        run: |
+          & .\.venv\Scripts\python.exe tools\audit_publication.py --check
+          if ($LASTEXITCODE -ne 0) { throw 'Die Prüfung der Repository-Dateien ist fehlgeschlagen.' }
+      - name: Offline-Tests ausführen
+        run: |
+          & .\.venv\Scripts\python.exe -m unittest discover -s tests -t . -v
+          if ($LASTEXITCODE -ne 0) { throw 'Tests fehlgeschlagen.' }
+      - name: Inno Setup installieren
+        run: |
+          choco install innosetup --yes --no-progress
+          if ($LASTEXITCODE -ne 0) { throw 'Inno Setup konnte nicht installiert werden.' }
+      - name: Ordner-Build, Installer, portable ZIP und Prüfsummen erzeugen
+        run: .\build.ps1 -RequireInstaller
+      - name: Release mit Downloads veröffentlichen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          $version = & .\.venv\Scripts\python.exe -c "from core.version import VERSION; print(VERSION)"
+          if ($LASTEXITCODE -ne 0) { throw 'Programmversion konnte nicht gelesen werden.' }
+          $assets = @('Output/EmulatorHub-Setup.exe', "Output/EmulatorHub-$version-portable.zip", 'Output/SHA256SUMS.txt')
+          foreach ($asset in $assets) {
+            if (-not (Test-Path -LiteralPath $asset -PathType Leaf)) { throw "Release-Datei fehlt: $asset" }
+          }
+          gh release create $env:RELEASE_TAG @assets --verify-tag --title "Emulator Hub $version" --notes-file CHANGELOG.md
+          if ($LASTEXITCODE -ne 0) { throw 'Das GitHub Release konnte nicht veröffentlicht werden.' }
