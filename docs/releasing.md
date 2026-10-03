@@ -21,16 +21,16 @@ git push -u origin main
 
 Die Ausgabe vor dem Commit prüfen: `.venv/`, `build/`, `dist/`, `Output/`, `test-artifacts/`, lokale Einstellungen, Spieleordner, Cache und Logs müssen ignoriert sein. Keine Zugangsdaten, heruntergeladenen Emulatoren, ROMs, BIOS- oder Firmware-Dateien hochladen. Eine `.gitignore` entfernt bereits verfolgte Dateien nicht automatisch; hier wird bewusst ein neues Repository angelegt. Es wird keine entfernte Veröffentlichung durch die lokale Projektvorbereitung ausgelöst.
 
-## Erstes Release
+## Release erstellen
 
-`core/version.py` enthält `1.0.0`. Ein Tag muss exakt zur dortigen Version passen. Nach erfolgreichem Test-Workflow:
+`core/version.py` enthält `1.0.4`. Ein Tag muss exakt zur dortigen Version passen. Nach erfolgreichem Test-Workflow:
 
 ```powershell
-git tag -a v1.0.0 -m "Emulator Hub 1.0.0"
-git push origin v1.0.0
+git tag -a v1.0.4 -m "Emulator Hub 1.0.4"
+git push origin v1.0.4
 ```
 
-`.github/workflows/release.yml` baut unter `windows-latest` mit Python 3.12 und dem Lockfile, führt Offline-Tests aus, erstellt den PyInstaller-Ordner-Build und installiert Inno Setup für den Installer. Das Release erhält `EmulatorHub-Setup.exe`, `EmulatorHub-1.0.0-portable.zip` und `SHA256SUMS.txt`. Es werden keine Emulatoren oder eigenen Benutzerdaten eingebunden. Der Release-Job besitzt `contents: write`; sein Veröffentlichungs-Schritt verwendet GitHubs kurzlebiges `GITHUB_TOKEN`. Keine persönlichen Zugangsdaten im Repository hinterlegen.
+`.github/workflows/release.yml` baut unter `windows-latest` mit Python 3.12 und dem Lockfile, führt Offline-Tests aus, erstellt den PyInstaller-Ordner-Build und installiert Inno Setup für den Installer. Das Release erhält `EmulatorHub-Setup.exe`, `EmulatorHub-1.0.4-portable.zip` und `SHA256SUMS.txt`. Es werden keine Emulatoren, PS4 PKG Tool oder eigenen Benutzerdaten eingebunden. Der Release-Job besitzt `contents: write`; sein Veröffentlichungs-Schritt verwendet GitHubs kurzlebiges `GITHUB_TOKEN`. Keine persönlichen Zugangsdaten im Repository hinterlegen.
 
 Unter **Actions** den Build beobachten und anschließend den Bereich **Releases** prüfen. Fehlerhafte Tests oder abweichende Versions-Tags verhindern die Veröffentlichung. Die Ausführung auf GitHub ist erst nach dem Push testbar; ein lokaler erfolgreicher Probe-Build ersetzt diese Prüfung nicht.
 
@@ -40,7 +40,7 @@ Nach einem Download kannst du eine Datei vergleichen:
 
 ```powershell
 Get-FileHash .\EmulatorHub-Setup.exe -Algorithm SHA256
-Get-FileHash .\EmulatorHub-1.0.0-portable.zip -Algorithm SHA256
+Get-FileHash .\EmulatorHub-1.0.4-portable.zip -Algorithm SHA256
 ```
 
 Die Werte müssen zu `SHA256SUMS.txt` des betreffenden Releases passen. Prüfsummen erkennen beschädigte oder abweichende Dateien; sie ersetzen keine digitale Signatur. Windows SmartScreen kann bei den unsignierten Paketen warnen.

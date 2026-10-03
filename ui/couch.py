@@ -17,6 +17,8 @@ from PySide6.QtWidgets import (
     QScrollArea, QVBoxLayout, QWidget,
 )
 
+from core.library import PS4_PACKAGE_STATUS, is_ps4_package, game_status, WINUAE_CONFIG_STATUS
+
 from .dialogs import label
 from .theme import STYLESHEET
 
@@ -114,7 +116,8 @@ class CouchTile(QAbstractButton):
         painter.setPen(QPen(border, 1.5 + 2.5 * amount))
         painter.drawRoundedRect(QRectF(self.rect()).adjusted(3, 3, -3, -3), 16, 16)
         if self.kind == "game":
-            art = QRectF(17, 17, self.width() - 34, self.height() - 106)
+            package = self.subtitle == PS4_PACKAGE_STATUS
+            art = QRectF(17, 17, self.width() - 34, self.height() - (144 if package else 106))
             painter.setPen(Qt.PenStyle.NoPen)
             painter.setBrush(QColor("#111b29"))
             painter.drawRoundedRect(art, 10, 10)
@@ -126,8 +129,8 @@ class CouchTile(QAbstractButton):
                 painter.drawPixmap(target, self.cover, QRectF(self.cover.rect()))
             else:
                 self._placeholder(painter, art)
-            heading = QRectF(19, self.height() - 78, self.width() - 38, 48)
-            subtitle = QRectF(19, self.height() - 30, self.width() - 38, 22)
+            heading = QRectF(19, self.height() - (116 if package else 78), self.width() - 38, 48)
+            subtitle = QRectF(19, self.height() - (66 if package else 30), self.width() - 38, 58 if package else 22)
             font_size = 16
         else:
             heading = QRectF(23, 30, self.width() - 46, 88)
@@ -138,8 +141,11 @@ class CouchTile(QAbstractButton):
         painter.drawText(heading, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter | Qt.TextFlag.TextWordWrap, self.title)
         painter.setFont(QFont("Segoe UI", 12))
         painter.setPen(QColor("#a4b6ce"))
-        painter.drawText(subtitle, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
-                         painter.fontMetrics().elidedText(self.subtitle, Qt.TextElideMode.ElideRight, int(subtitle.width())))
+        if self.kind == "game" and self.subtitle == PS4_PACKAGE_STATUS:
+            painter.drawText(subtitle, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter | Qt.TextFlag.TextWordWrap, self.subtitle)
+        else:
+            painter.drawText(subtitle, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
+                             painter.fontMetrics().elidedText(self.subtitle, Qt.TextElideMode.ElideRight, int(subtitle.width())))
 
     @staticmethod
     def _placeholder(painter, rect):
@@ -159,6 +165,7 @@ class CouchDialog(QDialog):
     """Eigene Vollbildansicht; Spielstarts übernimmt weiterhin das Hauptfenster."""
 
     launchRequested = Signal(str)
+    packageInstallRequested = Signal(str)
 
     def __init__(self, service, parent=None, *, backend=None):
         super().__init__(parent)
@@ -284,7 +291,7 @@ class CouchDialog(QDialog):
         self._console = None
         self._clear_tiles()
         groups = {}
-        for game in self.service.library.games:
+        for game in getattr(self.service.library, "visible_games", self.service.library.games):
             groups.setdefault(game.get("console") or "Noch zuordnen", []).append(game)
         self.heading.setText("Konsolen")
         self.summary.setText("Wähle eine Konsole und anschließend dein Spiel.")
@@ -303,19 +310,28 @@ class CouchDialog(QDialog):
         self._console = console
         self._clear_tiles()
         self.heading.setText(console)
-        games = [game for game in self.service.library.games if (game.get("console") or "Noch zuordnen") == console]
+        games = [game for game in getattr(self.service.library, "visible_games", self.service.library.games)
+                 if (game.get("console") or "Noch zuordnen") == console]
         display_games = [(game, self._metadata(game)) for game in games]
         display_games.sort(key=lambda pair: str(pair[1].get("title") or pair[0].get("name", "")).casefold())
-        self.summary.setText(f"{len(games)} eigene Spiele · A / Enter startet das gewählte Spiel.")
+        package_count = sum(is_ps4_package(game) for game in games)
+        self.summary.setText(
+            f"{len(games)} eigene Einträge · A / Enter: Spiel starten oder Paketinstallation öffnen."
+            if package_count else f"{len(games)} eigene Spiele · A / Enter startet das gewählte Spiel."
+        )
         for game, metadata in display_games:
             title = metadata.get("title") or game.get("name", "Unbenanntes Spiel")
-            subtitle = "Datei fehlt" if game.get("missing") else str(metadata.get("year") or game.get("console") or "Konsole noch zuordnen")
+            package = is_ps4_package(game)
+            subtitle = PS4_PACKAGE_STATUS if package else "Datei fehlt" if game.get("missing") else str(metadata.get("year") or game.get("console") or "Konsole noch zuordnen")
+            if game_status(game) == WINUAE_CONFIG_STATUS:
+                subtitle = WINUAE_CONFIG_STATUS
             tile = CouchTile(str(title), subtitle)
-            tile.setToolTip(game.get("path", ""))
+            tile.setToolTip(f"{subtitle}\n{game.get('path', '')}")
             cover_path = metadata.get("cover_path")
             if isinstance(cover_path, (str, Path)) and str(cover_path):
                 self._cover_files[len(self._tiles)] = str(cover_path)
-            self._append_tile(tile, lambda _=False, identifier=game["id"]: self.launchRequested.emit(identifier))
+            signal = self.packageInstallRequested if package else self.launchRequested
+            self._append_tile(tile, lambda _=False, identifier=game["id"], target=signal: target.emit(identifier))
         self.empty_label.setVisible(not self._tiles)
         self.back_button.setText("Konsolen · B / Rücktaste")
         self._layout_tiles()

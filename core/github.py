@@ -33,6 +33,9 @@ class GitHubClient:
         return release
 
     def asset(self, entry, release):
+        if entry.get("entry_type") == "utility" and (not isinstance(release, dict)
+                or release.get("draft") or release.get("prerelease")):
+            raise HubError("Für dieses Hilfsprogramm ist kein stabiles Release verfügbar. Bitte die manuelle Anleitung verwenden.")
         pattern = entry.get("download_muster", "")
         if not pattern:
             raise HubError("Für diesen Emulator ist kein zuverlässiges Windows-Downloadmuster hinterlegt.")

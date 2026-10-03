@@ -2,7 +2,7 @@
 
 [Zur Projektstartseite](../README.md) · [Entwicklung und Build](development.md) · [Veröffentlichen](releasing.md)
 
-Natives Desktop-Programm für Windows 10/11 x64 mit Python 3.12 und PySide6. Der Katalog enthält die 22 Einträge des Blatts **Emulatoren** aus `docs/emulatoren_mit_downloadanleitungen.xlsx`, verteilt auf sieben Kategorien. Die Excel-Dateien werden nicht verändert.
+Natives Desktop-Programm für Windows 10/11 x64 mit Python 3.12 und PySide6. Der Katalog enthält die 25 Einträge des Blatts **Emulatoren** aus `docs/emulatoren_mit_downloadanleitungen.xlsx`, verteilt auf acht Kategorien. Standardmäßig sind 23 Emulator-Einträge sichtbar, einschließlich **Commodore / Amiga** mit **WinUAE**. shadPS4 und PS4 PKG Tool unter **Sony PlayStation** bleiben erhalten und sind vorübergehend ausgeblendet. Die Anwendung liest den JSON-Katalog und verändert die Excel-Dateien nicht.
 
 ## Start
 
@@ -34,6 +34,8 @@ Die Oberfläche bietet Kategorien, eine Suche, farbige PC-Anforderungen, Install
 
 ## Startseite, Systemcheck und gemeinsame Updates
 
+Unter **Einstellungen → Ausgeblendete Einträge anzeigen** kannst du ausgeblendete Katalogeinträge wieder sichtbar machen. Die Option ist standardmäßig aus. Solange sie aus ist, erscheinen shadPS4 und PS4 PKG Tool weder in Kategorien/Karten, Suche, Favoriten und Verlauf noch im Systemcheck, der Spielebibliothek oder im Vollbild-Modus. Leere Kategorien werden ebenfalls ausgeblendet. **Alle aktualisieren** überspringt ausgeblendete Einträge. Die Option ändert nur die Anzeige und Auswahl: vorhandene Installationen, gespeicherte Zuordnungen, Favoriten, Bibliotheksmetadaten und eigene Spieleordner werden nicht gelöscht oder deinstalliert. Für eine spätere dauerhafte Reaktivierung kann `hidden` in den Katalogquellen wieder auf `false` gesetzt werden.
+
 Mit dem Stern auf einer Emulator-Karte wird der Emulator zum Favoriten. Auf der **Startseite** stehen diese Favoriten und **Zuletzt benutzt**; ein Emulatorstart oder Spielstart aktualisiert den Verlauf. Favoriten, Verlauf, Spieleordner und der letzte Systemcheck liegen in `settings.json`.
 
 Rechts neben den Aktionen jeder Karte stehen zwei kleine Symbolbuttons: **Emulator-Ordner öffnen** öffnet den gespeicherten Installationsordner im Windows-Explorer, auch bei manueller Zuordnung. Ohne Installation ist der Button ausgegraut. **Spiele-Ordner öffnen** funktioniert unabhängig davon und legt beim ersten Klick einen eigenen Ordner unter `Dokumente\EmulatorHub\Games\<Emulator-Name>\` an. Die Namen werden für Windows bereinigt; bei gleichen Namen unterscheidet die Emulator-ID die Ordner. Ein Rechtsklick bietet **Spiele-Ordner ändern…** und **Auf Standard zurücksetzen**. Die Pfade werden pro Emulator unter `games_dir` in `settings.json` gespeichert. Im portablen Modus liegt der Standard unter `<Programmordner>\Games\<Emulator-Name>\`. Öffnen, Ändern und Zurücksetzen kopieren oder verschieben keine Spiel-Dateien; diese Ordner werden auch nicht automatisch zur Bibliothek hinzugefügt.
@@ -42,13 +44,15 @@ Beim ersten Start erfolgt automatisch ein **Systemcheck**. Der gleichnamige Butt
 
 Die Schwellen in `configs/system_requirements.json` bestimmen Mindestwerte und empfohlene Werte für **Sehr niedrig** bis **Sehr hoch**. GPU-Namen werden anhand bearbeitbarer Schlüsselwörter einer groben Klasse zugeordnet. `ram_tolerance_gb` erlaubt standardmäßig 0,5 GiB Abweichung für hardwareseitig reservierten Arbeitsspeicher, damit beispielsweise 31,92 GiB bei nominell 32 GiB nicht allein eine schlechtere Einstufung verursachen. Die Einschätzung ist **keine Garantie und kein Benchmark**: CPU-Architektur und Takt, GPU-Treiber, Auflösung, Emulatoreinstellungen und das einzelne Spiel beeinflussen die tatsächliche Leistung. Bei mehreren GPUs verwendet der Check die höchste erkannte Klasse; die vom Emulator tatsächlich gewählte GPU kann abweichen. Änderungen an den Schwellen werden mit einem neuen Systemcheck übernommen.
 
-**Alle aktualisieren** prüft sämtliche zugeordneten Emulatoren auf Updates und installiert verfügbare, automatisch verwaltete Updates nacheinander. Gesamtfortschritt und Aktivitätsprotokoll zeigen den Stand. Ein Fehler bei einem Emulator verhindert die folgenden Aktualisierungen nicht. Manuelle Zuordnungen und Einträge ohne verlässlichen Versionsvergleich werden erklärt und bleiben zur manuellen Aktualisierung vorgesehen. Bereits aktuelle Installationen werden übersprungen; ein Abbruch beendet die restliche Warteschlange.
+**Alle aktualisieren** prüft sämtliche sichtbaren zugeordneten Emulatoren auf Updates und installiert verfügbare, automatisch verwaltete Updates nacheinander. Gesamtfortschritt und Aktivitätsprotokoll zeigen den Stand. Ein Fehler bei einem Emulator verhindert die folgenden Aktualisierungen nicht. Manuelle Zuordnungen und Einträge ohne verlässlichen Versionsvergleich werden erklärt und bleiben zur manuellen Aktualisierung vorgesehen. Bereits aktuelle Installationen werden übersprungen; ein Abbruch beendet die restliche Warteschlange.
+
+PS4 PKG Tool nimmt nicht an der Sammelaktualisierung teil. Jeder Download des separaten Hilfsprogramms benötigt einen eigenen ausdrücklichen Klick und den Quellen-/Prüfsummenhinweis.
 
 ## Bibliothek eigener Spiel-Dateien
 
 Unter **Einstellungen** lassen sich ein oder mehrere Spieleordner hinzufügen oder entfernen. **Speichern und scannen** beziehungsweise **Bibliothek scannen** durchsucht ihre Unterordner im Hintergrund. Der Fortschritt zeigt zunächst die Suche und anschließend die Erfassung. Doppelte Dateien aus überlappenden Ordnern werden nur einmal erfasst. Symlinks, Windows-Junctions und der eigene Hub-Datenordner werden übersprungen. Nicht lesbare oder fehlende Ordner werden im Protokoll erklärt; die übrigen Ordner werden weiter gescannt.
 
-`configs/extensions.json` enthält die Zuordnung von Dateiendungen zu Konsolen. Ein einzelner Konsolenname ordnet beispielsweise `.nes`, `.sfc`/`.smc`, `.gb`/`.gbc`, `.gba`, `.z64`/`.n64`/`.v64`, `.nds`, `.3ds`, `.gcm`/`.rvz`/`.wbfs`, `.gen`/`.md` oder `.cdi`/`.gdi` direkt zu. Eine Liste kennzeichnet eine mehrdeutige Endung: `.iso`, `.cue`, `.bin`, `.chd`, `.cso`, `.elf` und `.zip` verlangen eine Auswahl. Auch ZIP-Archive können zu verschiedenen Konsolen gehören; der Hub öffnet oder entpackt sie für die Erkennung nicht. Weitere mitgelieferte Zuordnungen umfassen etwa `.vpk` für PS Vita und `.self` für PlayStation 3. Änderungen dieser Konfiguration werden nach einem Neustart und erneutem Scan verwendet.
+`configs/extensions.json` enthält die Zuordnung von Dateiendungen zu Konsolen. Ein einzelner Konsolenname ordnet beispielsweise `.nes`, `.sfc`/`.smc`, `.gb`/`.gbc`, `.gba`, `.z64`/`.n64`/`.v64`, `.nds`, `.3ds`, `.gcm`/`.rvz`/`.wbfs`, `.gen`/`.md` oder `.cdi`/`.gdi` direkt zu. Eine Liste kennzeichnet eine mehrdeutige Endung: `.iso`, `.cue`, `.bin`, `.chd`, `.cso`, `.elf` und `.zip` verlangen eine Auswahl. Auch ZIP-Archive können zu verschiedenen Konsolen gehören; der Hub öffnet oder entpackt sie für die Erkennung nicht. Weitere mitgelieferte Zuordnungen umfassen etwa `.vpk` für PS Vita und `.self` für PlayStation 3. Für Amiga werden eigene `.adf`, `.adz`, `.dms`, `.ipf`, `.hdf`, `.lha` und `.uae` zugeordnet; `.cue` und `.iso` bleiben mehrdeutig und bieten zusätzlich Amiga an. Eigene Images sind **über WinUAE-Konfiguration zu starten**; direkt startet der Hub nur vorbereitete `.uae`-Konfigurationen. Änderungen dieser Konfiguration werden nach einem Neustart und erneutem Scan verwendet.
 
 Auf der Seite **Bibliothek** stehen die Spiele nach Konsole gruppiert. Suche nach Name oder Dateipfad, Konsolenfilter, **Nur Favoriten** sowie Sortierung nach Name oder zuletzt gespielt lassen sich kombinieren. Ein Stern markiert einen Spiel-Favoriten. **Konsole zuordnen** korrigiert eine Erkennung oder löst eine mehrdeutige Endung auf; diese manuelle Wahl bleibt bei weiteren Scans erhalten.
 
@@ -56,9 +60,60 @@ Ein **Doppelklick** oder **Spiel starten** startet die eigene Datei mit einem pa
 
 `library.json` speichert ausschließlich Dateipfade und Metadaten wie Konsole, Favorit und zuletzt gespielt. Der Scan kopiert und verändert keine Spiel-Dateien und lädt keine Spiele herunter. Verschobene oder gelöschte Dateien bleiben mit ihren Metadaten als **Datei fehlt** sichtbar. Ein abgebrochener Scan ersetzt die bisherige Bibliothek nicht.
 
+Bei aktivierter Anzeige ausgeblendeter Einträge werden eigene `.pkg`-Dateien aus einem Bibliotheksordner oder dem zugeordneten Spieleordner einer PS4-Karte als **Im PS4 PKG Tool installieren** erfasst. Sie erhalten keinen Spielstart; auch eine gespeicherte alte Zuordnung macht sie nicht startbar. Der gesonderte Button **Im PS4 PKG Tool installieren** übergibt genau diese Datei an das externe Hilfsprogramm. Fehlt das Tool, bietet der Hub dessen ausdrückliche Installation mit Downloadhinweis an. Ein Doppelklick auf ein Paket führt zu dieser Hilfe statt zu einem Emulatorstart. Der [PS4-Paketablauf](#eigene-ps4-pakete-mit-ps4-pkg-tool) beschreibt die anschließenden manuellen Schritte.
+
 Der Spielstart verwendet die im Katalog dokumentierten `launch_args` und gegebenenfalls ein `launch_profiles`-Profil für die tatsächlich ausgewählte EXE. Argumente werden als Liste ohne Shell übergeben; Leerzeichen und Sonderzeichen im Dateipfad bleiben erhalten. Fehlt ein bestätigtes Startprofil, erscheint eine verständliche Anleitung. `launch_extensions` begrenzt bei Bedarf die direkt startbaren Dateitypen.
 
 Emulatorinterne Ersteinrichtung bleibt erforderlich, beispielsweise für Controller, eigene Firmware und Grafik. RPCS3 benötigt ein passend vorbereitetes, entpacktes eigenes Spiel, etwa `EBOOT.BIN`, statt eines beliebigen ISO-Abbilds. Vita3K verarbeitet unterstützte eigene Pakete; dabei kann der Emulator selbst das Spiel zunächst installieren und benötigt seine eigene Einrichtung. FinalBurn Neo verwendet den standardisierten Spiel-/Treibernamen; den Ordner mit den eigenen Arcade-Dateien muss man einmal im Emulator einstellen. MAME verwendet ein eigenes Argumentprofil mit Spielordner und Spielnamen. RetroArch benötigt einen passend eingerichteten Core und ein ausdrückliches Startprofil im Katalog; die BlastEm-Argumente werden dafür nicht automatisch übernommen. Welche Datei ein konkreter Emulator unterstützt, hängt zudem vom Spiel und seiner Version ab.
+
+## Amiga mit WinUAE
+
+Die Kategorie **Commodore / Amiga** enthält **WinUAE** für **Amiga (A500, A1200, CD32 …)**, Plattform **Windows**, PC-Anforderung **Niedrig**. Diese Einstufung ist eine grobe Einschätzung; aufwendige Erweiterungen und CPU-/JIT-Einstellungen können mehr Leistung verlangen.
+
+**Installieren** ruft ausschließlich die [offizielle Downloadseite](https://www.winuae.net/download/) ab. Der Hub vergleicht die aktuelle stabile Versionsüberschrift mit dem tatsächlich verlinkten 64-Bit-ZIP und lädt dieses aus `https://download.abime.net/winuae/releases/`. Das Archiv wird mit Fortschritt in den Hub-Emulatorordner entpackt; Startdatei ist die im echten Archiv bestätigte `winuae64.exe`. Desktop-/Startmenü-Verknüpfungen sind optional. Beta-Dateien, alte Versionen und Zusatzpakete werden nicht ausgewählt. Ist die Seite nicht eindeutig erkennbar oder passt der Dateiname nicht zur aktuellen Version, bleibt die manuelle Anleitung; vorhandene Installationen bleiben erhalten.
+
+Bei der Prüfung am **03.10.2026** nennt die Seite **6.0.3** und verlinkt diese vier Programmdateien, jeweils von `download.abime.net`:
+
+| Paket | 32 Bit | 64 Bit |
+| --- | --- | --- |
+| MSI-Installer | `InstallWinUAE6030.msi` | `InstallWinUAE6030_x64.msi` |
+| ZIP | `WinUAE6030.zip` | `WinUAE6030_x64.zip` |
+
+Die aktuelle stabile Version steht getrennt von Erweiterungen und alten Versionen. Derzeit enthält die Downloadseite keinen Beta-Link oder eigenen Beta-Bereich; der Resolver akzeptiert nur den aktuellen stabilen WinUAE-Abschnitt. Es wurde keine dedizierte Versions-/Prüfsummen-API und keine offizielle SHA-256-Angabe gefunden. Die WordPress-JSON-Ausgabe enthält lediglich dieselbe HTML-Seite. Der lokale berechnete Downloadhash ist deshalb keine Hersteller-Prüfsumme. **Auf Updates prüfen** und **Alle aktualisieren** vergleichen bei automatisch verwalteten WinUAE-Installationen die sicher erkannte stabile Version; manuell zugeordnete Installationen und nicht eindeutig auflösbare Seiten werden als manuell zu prüfen erklärt. Details und Quellen: [Katalogprüfung](catalog_sources.md#winuae-stabile-downloadseite-und-amiga-konfiguration).
+
+**WinUAE enthält kein Kickstart-ROM.** Du brauchst ein lizenziertes bzw. aus eigener Amiga-Hardware selbst gesichertes Kickstart, beispielsweise gekauft mit Amiga Forever. Der Hub lädt, verlinkt oder bündelt keine Kickstart-ROMs, Spiele, ADF-Abbilder oder Workbench-Dateien. In WinUAE unter **Paths** den **ROMs**-Ordner auswählen und in der ROM-Auswahl das zum Hardwaremodell passende eigene Kickstart einstellen. Pfad und Dateiname hängen vom Modell und der eigenen Konfiguration ab; der BIOS-Checker behauptet keinen festen universellen Pfad. Tatsächlich verwendete eigene Dateien lassen sich im Hub manuell für die Prüfung zuordnen.
+
+Richte Hardwaremodell, eigene Disk-/Festplatten-/CD-Abbilder und Controller in WinUAE ein und speichere deine Konfiguration als **`.uae`**. Diese vorbereitete Konfiguration lädt der Bibliotheksstart mit `-f <eigene Konfiguration> -s use_gui=no`, als Argumentliste ohne Shell. Rohe Images werden mit **über WinUAE-Konfiguration zu starten** gekennzeichnet, weil sie allein kein vollständiges Amiga-/Kickstart-Profil bestimmen. Der Hub erzeugt kein geratenes Direktstartprofil. Für die manuelle Installation auf der offiziellen Seite das aktuelle **Download (64-bit)**-ZIP wählen, vollständig entpacken und den Ordner mit `winuae64.exe` im Hub zuordnen.
+
+Auch mit einer älteren lokalen Dateiendungs-Konfiguration werden fehlende Amiga-Endungen erkannt. Bei unveränderten Standardlisten für `.iso` und `.cue` steht Amiga zusätzlich zur Auswahl. Individuell geänderte Zuordnungen und die gespeicherte Konfigurationsdatei bleiben erhalten.
+
+## PlayStation 4 mit shadPS4
+
+**Vorübergehend ausgeblendet:** Die folgende vorhandene PS4-Anleitung gilt bei aktivierter Option **Einstellungen → Ausgeblendete Einträge anzeigen**. Alle Quellen, Startprofile und installierten Daten bleiben erhalten. Mit ausgeschalteter Option werden auch PS4-Spiele/Pakete in der Bibliothek ausgeblendet und PS4 nicht geprüft oder aktualisiert.
+
+PS4 wird über die Karte **PS4 PKG Tool** eingerichtet. Der Hub verwaltet den Emulator und QTLauncher nicht mehr selbst. Bei aktivierter Anzeige erscheint auch die veraltete shadPS4-Karte; vorhandene Installationen bleiben startbar, neue Hub-Installationen und Updates bleiben gesperrt. Ihre Dateien, Zuordnungen, Favoriten und bisherigen Startprofile bleiben erhalten. Neue Installationen und Updates übernimmt der Manager im Tool. Wird später `hidden: false` gesetzt, gilt wieder die bisherige Anzeige ausschließlich für Altinstallationen.
+
+### Eigene PS4-Pakete mit PS4 PKG Tool
+
+**PS4 einrichten** bietet beim ersten Klick die Installation des Drittprogramms aus einem stabilen offiziellen Release an. Vor dem Download musst du Quelle, SHA-256 und den Drittanbieter-/Antivirus-Hinweis ausdrücklich bestätigen. Bei fehlendem stabilem Asset oder fehlender offizieller Prüfsumme bleibt die manuelle Anleitung. Bei installiertem Tool öffnet der Button dessen Hauptfenster ohne zusätzliche Argumente.
+
+Die fünf Schritte auf der Karte:
+
+1. **PS4 PKG Tool** mit **PS4 einrichten** starten.
+2. **Tools > shadPS4 Manager** öffnen, shadPS4 über **Install shadPS4** und QTLauncher installieren.
+3. Im Manager den Spielebibliotheksordner festlegen.
+4. Eigene Basis-PKG und passende Update-PKG laden und **Install to shadPS4** wählen.
+5. QTLauncher starten.
+
+Der Ablauf ist in der [offiziellen Release-Anleitung](https://github.com/pearlxcore/PS4PKGTool/releases/tag/v1.8.0) und im [README](https://github.com/pearlxcore/PS4PKGTool/blob/v1.8.0/README.md#shadps4-setup-and-use) belegt. Menünamen können sich in neuen Versionen oder Übersetzungen ändern.
+
+**Ordner für Spiele-PKGs öffnen** öffnet deinen eigenen Paketordner. Ein Rechtsklick erlaubt das Ändern oder Zurücksetzen seiner Zuordnung; dabei werden persönliche Dateien nicht gelöscht. Dieser Ordner enthält die ursprünglichen PKGs und ist vom Spielebibliotheksordner zu unterscheiden, den du im Tool festlegst. Nur eigene Spiele verwenden.
+
+Die Bibliothek zeigt Pakete als **Im PS4 PKG Tool installieren**. Der Paketbutton übergibt genau einen Dateipfad als **`[exe, pkg_path]`** ohne Shell und öffnet den PKG Viewer; die eigentliche Installation erfolgt im Hauptfenster. Das Tool wird nicht automatisch beim Scan installiert, und der Hub liest keine PKG-Inhalte. Installierte Spiele verwaltest und startest du in QTLauncher bzw. im Tool.
+
+Geprüft ist das offizielle [GPL-3.0-Projekt](https://github.com/pearlxcore/PS4PKGTool/blob/v1.8.0/LICENSE) mit dem stabilen Windows-x64-Asset **`PS4-PKG-Tool-v1.8.0.zip`**, Startdatei **`PS4 PKG Tool.exe`**, .NET-10-Desktop-Laufzeit. SHA-256: `1ef9bb1f4ec1ad4e10f5a7d814e216323019385977c5b4409c911c5943884ea1`. Für eine manuelle Tool-Zuordnung das vollständige offizielle stabile ZIP entpacken und den Ordner über **Anleitung → Ordner auswählen** registrieren.
+
+Das Tool wird weder im Repository noch in Release-Paketen mitgeliefert. Der Hub entschlüsselt oder entpackt keine PS4-Pakete, enthält keine Schlüssel und bietet keine Spiele-, PKG-, BIOS- oder Firmware-Links. Reale Tool-/Spielinstallation und Runtime-Einrichtung wurden nicht ausgeführt; Prozesse und API-Antworten werden in Tests simuliert.
 
 ## Cover und Spielinfos
 
@@ -142,7 +197,7 @@ Das Hilfsskript verwendet QtSvg und Pillow und erzeugt aus SVG `assets/logo.png`
 
 ## Automatische Installation
 
-Die folgenden neun Einträge verwenden **stabile offizielle GitHub-Releases** und ein eindeutig überprüftes Windows-x64-ZIP. Die konkrete Version wird bei jeder Installation über die API bestimmt; es wird keine Versionsnummer als Dauer-Download festgeschrieben.
+Neun sichtbare Emulator-Einträge sowie das ausgeblendete PS4-Hilfsprogramm verwenden **stabile offizielle GitHub-Releases** und ein eindeutig überprüftes Windows-x64-ZIP. Die konkrete Version wird bei jeder Installation über die API bestimmt; es wird keine Versionsnummer als Dauer-Download festgeschrieben.
 
 | Emulator | Konsole | Automatischer Weg / Besonderheit |
 | --- | --- | --- |
@@ -155,6 +210,10 @@ Die folgenden neun Einträge verwenden **stabile offizielle GitHub-Releases** un
 | PPSSPP | PSP | Offizielles Windows-x64-ZIP; Start über PPSSPPWindows64.exe. |
 | Flycast | Dreamcast | Offizielles Win64-ZIP. |
 | xemu | Xbox | Offizielles versioniertes Windows-x86_64-ZIP; Debug-/Symbolpakete werden ausgeschlossen. |
+| PS4 PKG Tool (ausgeblendet) | PlayStation 4 (Hilfsprogramm) | **PS4 einrichten**: bestätigter stabiler Tool-Download; shadPS4 und QTLauncher im shadPS4 Manager des Tools einrichten. |
+| shadPS4 (ausgeblendet, veraltet, nur Altinstallation) | PlayStation 4 | Bestehende Installation bleibt startbar. Keine neue Installation oder Updates durch den Hub. |
+
+WinUAE ergänzt diese Wege als `auto_direct`: ausschließlich das aktuelle stabile Windows-x64-ZIP aus der offiziellen Downloadseite, mit Versions-/Dateinamenprüfung und manueller Alternative.
 
 Eine erfolgreiche Installation bedeutet, dass das Programm eingerichtet und seine Startdatei gefunden wurde. Emulatorinterne Ersteinrichtung kann anschließend erforderlich sein. Die in der Tabelle genannten übrigen Plattformen dienen der Information; der Hub installiert Windows-x64-Pakete.
 
@@ -181,7 +240,7 @@ Bei diesen Einträgen öffnet **Installieren** die Anleitung. Dort stehen konkre
 
 Wenn eine automatische Quelle ihr Dateinamenformat ändert, ein Download scheitert oder eine Prüfsumme nicht stimmt, wird die vorhandene Installation erhalten. Der Fehlerdialog bietet die manuelle Anleitung an.
 
-Alle Quellen, geprüften Dateinamen und Gründe sind zusätzlich in [docs/catalog_sources.md](catalog_sources.md) dokumentiert (Prüfdatum: 01.10.2026).
+Alle Quellen, geprüften Dateinamen und Gründe sind zusätzlich in [docs/catalog_sources.md](catalog_sources.md) dokumentiert (bisherige Quellen: 01.10.2026; PS4 und WinUAE: 03.10.2026).
 
 ## Lokale Daten und Deinstallation
 
@@ -189,7 +248,7 @@ Standardordner: `%LOCALAPPDATA%\EmulatorHub\`
 
 - `emulators\<id>\`: automatisch verwaltete portable Programme.
 - `installed.json`: Pfad, Startdatei, Version, UTC-Installationsdatum, Installationsmethode und Verknüpfungen; bei automatischen Downloads auch der berechnete SHA-256-Hash.
-- `settings.json`: Emulator-Favoriten, zuletzt benutzte Emulatoren, Bibliotheksordner, Spiele-Ordner pro Emulator (`games_dir`), Systemcheck, gewählte Metadatenquelle und Bibliotheksansicht sowie eigene BIOS-/Sicherungs-/Controllerprofilpfade und Controller-Änderungsverlauf. Keine Zugangsdaten.
+- `settings.json`: Anzeige ausgeblendeter Einträge, Emulator-Favoriten, zuletzt benutzte Emulatoren, Bibliotheksordner, Spiele-Ordner pro Emulator (`games_dir`), Systemcheck, gewählte Metadatenquelle und Bibliotheksansicht sowie eigene BIOS-/Sicherungs-/Controllerprofilpfade und Controller-Änderungsverlauf. Keine Zugangsdaten.
 - `library.json`: eigene Spiel-Dateipfade, Konsolenzuordnung, Spiel-Favoriten und zuletzt gespielt.
 - `configs\system_requirements.json`: bearbeitbare Hardware-Schwellen und GPU-Klassen.
 - `configs\extensions.json`: bearbeitbare Dateiendungszuordnung für die Bibliothek.
@@ -227,11 +286,11 @@ Beim Python-Start wird `catalog.json` im Projekt geladen. Die EXE bevorzugt eine
 Einträge benötigen `id`, `kategorie`, `hersteller`, `konsole`, `emulator`, `plattformen`, `pc_anforderung`, `official_url`, `download_anleitung`, `hinweis`, `install_methode`, `download_muster`, `exe` und `manuelle_schritte`. Der Rechtshinweis muss in `hinweis` enthalten sein. Neue Kategorien werden in `categories` ergänzt, neue geprüfte offizielle Quellen in `official_sources`. IDs bleiben nach der Installation unverändert.
 
 - `auto_github`: zusätzlich `github_repo` und ein eindeutiger regulärer Ausdruck in `download_muster`; `archive_type` typischerweise `zip`.
-- `auto_direct`: zusätzlich eine überprüfte `direct_url`, gegebenenfalls `direct_version`, `sha256` oder `checksum_url`. Archive werden wie GitHub-Downloads geprüft. Bei `archive_type: "installer"` wird der offizielle Installer gestartet; nach Abschluss muss dessen Ordner manuell zugeordnet werden.
-- `winget`: nur für separat geprüfte Pakete und Manifeste verwenden; die mitgelieferten 22 Einträge benötigen diese Methode nicht. Details und Sicherheitsgrenzen stehen weiter unten.
+- `auto_direct`: zusätzlich eine überprüfte `direct_url`, gegebenenfalls `direct_version`, `sha256` oder `checksum_url`. Bei WinUAE bezeichnet `direct_url` die offizielle Downloadseite und `direct_resolver: "winuae"` die sichere aktuelle stabile Link-/Versionsauflösung; kein festgeschriebener Archivlink oder erfundener Herstellerhash. Archive werden wie GitHub-Downloads geprüft. Bei `archive_type: "installer"` wird der offizielle Installer gestartet; nach Abschluss muss dessen Ordner manuell zugeordnet werden.
+- `winget`: nur für separat geprüfte Pakete und Manifeste verwenden; die 25 erhaltenen Katalogeinträge benötigen diese Methode nicht. Details und Sicherheitsgrenzen stehen weiter unten.
 - `manuell`: leeres Downloadmuster erlaubt; nachvollziehbare nummerierte Schritte und eine passende Startdatei hinterlegen. `alternative_exes` erlaubt alternative Dateinamen, etwa `retroarch.exe` bei einem Core.
 
-Für die neuen Funktionen können Einträge außerdem `launch_args`, `launch_profiles`, `launch_extensions` und `launch_note`, `bios`/`bios_note` sowie `backup_paths`/`backup_note` enthalten. Sie beschreiben bestätigte Spielstartparameter, erwartete eigene BIOS-Dateien und gezielte Sicherungsprofile. Argumentvorlagen unterstützen `{game}`, `{game_dir}`, `{game_stem}` und `{exe_dir}`. Alternative EXE-Dateien brauchen ihr eigenes bestätigtes Profil; `null` bedeutet, dass dafür noch kein direkter Spielstart hinterlegt ist. Das Format und Beispiele stehen in [docs/new_catalog_fields.md](new_catalog_fields.md). Für dauerhafte Änderungen beim Excel-Import dieselben Felder auch in `tools/catalog_enrichment.json` pflegen.
+Für die neuen Funktionen können Einträge außerdem `start_args`, `start_note` und `launcher` für den Kartenstart sowie `launch_args`, `launch_profiles`, `launch_extensions` und `launch_note` für Bibliotheksspiele, `bios`/`bios_note` und `backup_paths`/`backup_note` enthalten. Sie beschreiben bestätigte Startparameter, erwartete eigene BIOS-Dateien und gezielte Sicherungsprofile. Spielargumentvorlagen unterstützen `{game}`, `{game_dir}`, `{game_stem}` und `{exe_dir}`. Alternative EXE-Dateien brauchen ihr eigenes bestätigtes Spielprofil; `null` bedeutet, dass dafür noch kein direkter Spielstart hinterlegt ist. Das Format und Beispiele stehen in [docs/new_catalog_fields.md](new_catalog_fields.md). Für dauerhafte Änderungen beim Excel-Import dieselben Felder auch in `tools/catalog_enrichment.json` pflegen.
 
 `controller_config` ist `"auto"` oder `"manuell"`, `controller_manual` enthält die deutsche Anleitung. Für den ausdrücklich unterstützten Dolphin-Adapter kommt `controller_adapter: "dolphin_gc_xinput"` hinzu. Ein bloßes Setzen von `"auto"` macht einen anderen Emulator nicht automatisch kompatibel; der Code akzeptiert nur einen vorhandenen geprüften Adapter. Diese Felder enthalten keine Dienst-Zugangsdaten.
 

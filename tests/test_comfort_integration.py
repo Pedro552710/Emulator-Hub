@@ -88,10 +88,15 @@ class ComfortIntegrationTests(unittest.TestCase):
     def test_catalog_controller_modes_and_excel_enrichment_stay_reproducible(self):
         from tools.import_catalog import import_workbook
         from core.controllers import CONTROLLER_GUIDES
-        self.assertEqual(len(CONTROLLER_GUIDES), len(self.service.catalog.items))
-        for entry in self.service.catalog.items:
+        emulators = [entry for entry in self.service.catalog.items if entry.get("entry_type") != "utility"]
+        self.assertEqual(len(self.service.catalog.items), 25)
+        self.assertEqual(set(CONTROLLER_GUIDES) | {"shadps4", "winuae"},
+                         {entry["id"] for entry in emulators})
+        for entry in emulators:
             self.assertEqual(entry["controller_config"], "auto" if entry["id"] == "dolphin" else "manuell")
             self.assertTrue(entry["controller_manual"])
+            if entry["id"] in CONTROLLER_GUIDES:
+                self.assertEqual(entry["controller_manual"], CONTROLLER_GUIDES[entry["id"]])
         project = Path(__file__).resolve().parents[1]
         output = self.root / "fresh-catalog.json"
         import_workbook(project / "docs/emulatoren_mit_downloadanleitungen.xlsx", output, project / "tools/catalog_enrichment.json")

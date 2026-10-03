@@ -3,6 +3,7 @@
   "favorites": [],
   "recent_emulators": [],
   "game_folders": [],
+  "show_hidden": false,
   "games_dir": {},
   "metadata_provider": "igdb"
 }

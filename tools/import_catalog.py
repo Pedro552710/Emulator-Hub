@@ -17,10 +17,11 @@ sys.path.insert(0, str(ROOT))
 from core.catalog import Catalog, LEGAL_NOTICE  # noqa: E402
 
 CHECKED = "2026-10-01"
-CATEGORIES = ["Nintendo", "Sony PlayStation", "Sega", "Microsoft Xbox", "Atari", "NEC", "SNK/Arcade"]
+CATEGORIES = ["Nintendo", "Sony PlayStation", "Sega", "Microsoft Xbox", "Atari", "NEC", "SNK/Arcade", "Commodore / Amiga"]
 CATEGORY_BY_MANUFACTURER = {
     "Nintendo": "Nintendo", "Sony": "Sony PlayStation", "Sega": "Sega",
     "Microsoft": "Microsoft Xbox", "Atari": "Atari", "NEC": "NEC", "SNK / Arcade": "SNK/Arcade",
+    "Commodore / Amiga": "Commodore / Amiga",
 }
 
 
@@ -70,13 +71,16 @@ def import_workbook(workbook_path: Path, output_path: Path, enrichment_path: Pat
             "manuelle_schritte": override["manuelle_schritte"],
             "install_begruendung": override["install_begruendung"],
             "quelle_zeile": row[0].row, "quelle_beschreibung": source_label,
-            "quelle_emulator": emulator, "verified_at": CHECKED,
+            "quelle_emulator": emulator, "verified_at": override.get("verified_at", CHECKED),
         }
         for field in (
-            "github_repo", "archive_type", "alternative_exes", "checksum_muster", "direct_url",
+            "hidden", "github_repo", "archive_type", "alternative_exes", "checksum_muster", "direct_url", "direct_resolver",
             "verified_release", "verified_asset", "verified_asset_sha256", "auto_emulator", "todo",
             "direct_version", "sha256", "checksum_url", "winget_id", "winget_version", "winget_manifest_url",
-            "launch_args", "launch_profiles", "launch_extensions", "launch_note", "bios", "bios_note", "backup_paths", "backup_note",
+            "start_args", "start_note", "launcher", "entry_type", "package_args",
+            "download_notice", "license", "deprecated", "deprecated_note", "replacement_id", "ps4_setup_steps",
+            "bios", "backup_paths", "bios_note", "backup_note",
+            "launch_args", "launch_profiles", "launch_extensions", "launch_note",
             "controller_config", "controller_adapter", "controller_manual", "controller_note",
         ):
             if field in override:

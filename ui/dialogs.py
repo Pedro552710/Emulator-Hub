@@ -33,7 +33,7 @@ def label(text: str, name: str | None = None, wrap: bool = True) -> QLabel:
 
 
 class ShortcutDialog(QDialog):
-    def __init__(self, entry: dict, parent=None):
+    def __init__(self, entry: dict, parent=None, *, download_notice: str | None = None):
         super().__init__(parent)
         self.setWindowTitle("Installation vorbereiten")
         self.setMinimumWidth(450)
@@ -41,7 +41,13 @@ class ShortcutDialog(QDialog):
         layout.setContentsMargins(26, 24, 26, 24)
         layout.setSpacing(12)
         layout.addWidget(label(entry["emulator"], "sectionTitle"))
-        layout.addWidget(label("Der Emulator wird im eigenen Emulator-Hub-Ordner installiert. Wähle die gewünschten Verknüpfungen.", "muted"))
+        utility = entry.get("entry_type") == "utility"
+        noun = "Das Hilfsprogramm" if utility else "Der Emulator"
+        layout.addWidget(label(f"{noun} wird im eigenen Emulator-Hub-Ordner installiert. Wähle die gewünschten Verknüpfungen.", "muted"))
+        if download_notice:
+            notice = label(download_notice, "muted")
+            notice.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+            layout.addWidget(notice)
         self.desktop = QCheckBox("Verknüpfung auf dem Desktop")
         self.startmenu = QCheckBox("Verknüpfung im Startmenü")
         self.startmenu.setChecked(True)

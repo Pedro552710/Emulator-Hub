@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 
 from PySide6.QtCore import Qt, QSize, Signal
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QCheckBox,
@@ -26,6 +27,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from core.library import game_status, is_ps4_package, WINUAE_CONFIG_STATUS
+
 from .dialogs import label
 from .metadata import CoverSettingsPanel, GameDetailsDialog, cover_icon, game_metadata
 
@@ -41,6 +44,7 @@ def _date_text(value: str) -> str:
 
 class LibraryPage(QWidget):
     launchRequested = Signal(str)
+    packageInstallRequested = Signal(str)
     assignmentRequested = Signal(str)
     favoriteRequested = Signal(str)
     settingsRequested = Signal()
@@ -81,7 +85,7 @@ class LibraryPage(QWidget):
         self.console_filter.setAccessibleName("Nach Konsole filtern")
         self.console_filter.addItem("Alle Konsolen", "all")
         self.console_filter.addItem("Noch zuordnen", "unassigned")
-        for console in self.service.library.supported_consoles:
+        for console in self.service.library.visible_supported_consoles:
             self.console_filter.addItem(console, console)
         self.console_filter.currentIndexChanged.connect(self.refresh_games)
         filters.addWidget(self.console_filter)
@@ -132,7 +136,7 @@ class LibraryPage(QWidget):
         self.grid.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.grid.setAccessibleName("Spiele mit Covern")
         self.grid.itemSelectionChanged.connect(self._update_actions)
-        self.grid.itemDoubleClicked.connect(lambda item: self.launchRequested.emit(item.data(Qt.ItemDataRole.UserRole)) if not self._busy else None)
+        self.grid.itemDoubleClicked.connect(lambda item: self._activate(item.data(Qt.ItemDataRole.UserRole)))
         self.grid.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.grid.customContextMenuRequested.connect(lambda point: self._context_menu(self.grid, point))
         self.views = QStackedWidget()
@@ -146,6 +150,9 @@ class LibraryPage(QWidget):
         self.launch_button.setObjectName("primary")
         self.launch_button.clicked.connect(lambda: self._request(self.launchRequested))
         actions.addWidget(self.launch_button)
+        self.package_install_button = QPushButton("Im PS4 PKG Tool installieren")
+        self.package_install_button.clicked.connect(lambda: self._request(self.packageInstallRequested))
+        actions.addWidget(self.package_install_button)
         self.assign_button = QPushButton("Konsole zuordnen")
         self.assign_button.clicked.connect(lambda: self._request(self.assignmentRequested))
         actions.addWidget(self.assign_button)
@@ -160,7 +167,13 @@ class LibraryPage(QWidget):
         actions.addWidget(self.details_button)
         actions.addStretch()
         layout.addLayout(actions)
-        layout.addWidget(label("Doppelklick startet ein Spiel. Bei mehrdeutigen Endungen wählst du die Konsole selbst. Spiele, BIOS und Firmware werden hier weder heruntergeladen noch verlinkt.", "footnote"))
+        self.package_help = label(
+            "Im PS4 PKG Tool installieren. Nur eigene Spiele verwenden. "
+            "Der Button öffnet den PKG Viewer; die Einrichtung erfolgt im Hauptfenster über PS4 einrichten.", "muted"
+        )
+        layout.addWidget(self.package_help)
+        self.usage_hint = label("", "footnote")
+        layout.addWidget(self.usage_hint)
         self.refresh_games()
 
     def selected_game_id(self):
@@ -177,8 +190,14 @@ class LibraryPage(QWidget):
 
     def _double_clicked(self, item, column):
         identifier = item.data(0, Qt.ItemDataRole.UserRole)
-        if identifier and column != 3 and not self._busy:
-            self.launchRequested.emit(identifier)
+        if column != 3:
+            self._activate(identifier)
+
+    def _activate(self, identifier):
+        if identifier and not self._busy:
+            game = self.service.library.get_game(identifier)
+            signal = self.packageInstallRequested if is_ps4_package(game) else self.launchRequested
+            signal.emit(identifier)
 
     def _clicked(self, item, column):
         identifier = item.data(0, Qt.ItemDataRole.UserRole)
@@ -186,9 +205,17 @@ class LibraryPage(QWidget):
             self.favoriteRequested.emit(identifier)
 
     def _update_actions(self):
-        enabled = bool(self.selected_game_id()) and not self._busy
-        self.launch_button.setEnabled(enabled)
-        self.assign_button.setEnabled(enabled)
+        identifier = self.selected_game_id()
+        game = self.service.library.get_game(identifier) if identifier else None
+        package = bool(game and is_ps4_package(game))
+        enabled = bool(identifier) and not self._busy
+        self.launch_button.setEnabled(enabled and not package)
+        self.launch_button.setVisible(not package)
+        self.package_install_button.setVisible(package)
+        self.package_install_button.setEnabled(enabled and not game.get("missing") if package else False)
+        self.package_help.setVisible(package)
+        self.assign_button.setEnabled(enabled and not package)
+        self.assign_button.setVisible(not package)
         self.favorite_button.setEnabled(enabled)
         if hasattr(self, "metadata_button"):
             self.metadata_button.setEnabled(enabled and hasattr(self.service, "metadata"))
@@ -221,12 +248,18 @@ class LibraryPage(QWidget):
         if not self.selected_game_id():
             return
         menu = QMenu(self)
-        menu.addAction("Spiel starten", lambda: self._request(self.launchRequested))
+        package = is_ps4_package(self.service.library.get_game(self.selected_game_id()))
+        if package:
+            action = menu.addAction("Im PS4 PKG Tool installieren", lambda: self._request(self.packageInstallRequested))
+            action.setEnabled(not self.service.library.get_game(self.selected_game_id()).get("missing"))
+        else:
+            menu.addAction("Spiel starten", lambda: self._request(self.launchRequested))
         menu.addAction("Details", self.show_details)
         action = menu.addAction("Cover && Infos laden", lambda: self._request(self.metadataRequested))
         action.setEnabled(hasattr(self.service, "metadata"))
         menu.addAction("Favorit umschalten", lambda: self._request(self.favoriteRequested))
-        menu.addAction("Konsole zuordnen", lambda: self._request(self.assignmentRequested))
+        action = menu.addAction("Konsole zuordnen", lambda: self._request(self.assignmentRequested))
+        action.setEnabled(not package)
         menu.exec(widget.viewport().mapToGlobal(point))
 
     def show_details(self):
@@ -242,10 +275,23 @@ class LibraryPage(QWidget):
         self._update_actions()
 
     def refresh_games(self, *_):
+        choices = [self.console_filter.itemData(index) for index in range(2, self.console_filter.count())]
+        consoles = self.service.library.visible_supported_consoles
+        if choices != consoles:
+            selected_console = self.console_filter.currentData()
+            self.console_filter.blockSignals(True)
+            while self.console_filter.count() > 2:
+                self.console_filter.removeItem(2)
+            for console in consoles:
+                self.console_filter.addItem(console, console)
+            self.console_filter.setCurrentIndex(max(0, self.console_filter.findData(selected_console)))
+            self.console_filter.blockSignals(False)
         selected = self.selected_game_id() if hasattr(self, "tree") else None
         query = self.search.text().strip().casefold()
         console = self.console_filter.currentData()
-        games = self.service.library.games
+        games = self.service.library.visible_games
+        action = "Doppelklick startet ein Spiel oder öffnet die PS4-Pakethilfe." if "PlayStation 4" in consoles else "Doppelklick startet ein Spiel."
+        self.usage_hint.setText(action + " Bei mehrdeutigen Endungen wählst du die Konsole selbst. Spiele, BIOS und Firmware werden hier weder heruntergeladen noch verlinkt.")
         for game in games:
             game["display_title"] = game_metadata(self.service, game["id"]).get("title") or game.get("name", "")
         games = [game for game in games if
@@ -266,23 +312,30 @@ class LibraryPage(QWidget):
             group = QTreeWidgetItem(self.tree, [f"{console} ({len(items)})"])
             group.setFirstColumnSpanned(True)
             for game in items:
-                state = "Datei fehlt" if game.get("missing") else "Konsole wählen" if not game.get("console") else "Bereit"
+                state = game_status(game)
                 item = QTreeWidgetItem(group, [game["display_title"], game.get("path", ""), _date_text(game.get("last_played", "")), "★" if game.get("favorite") else "☆", state])
                 item.setData(0, Qt.ItemDataRole.UserRole, game["id"])
                 item.setToolTip(1, game.get("path", ""))
+                item.setToolTip(4, state)
                 item.setToolTip(3, "Klicken, um den Favoritenstatus zu ändern")
                 if game["id"] == selected:
                     self.tree.setCurrentItem(item)
-                tile = QListWidgetItem(cover_icon(self.service, game["id"]), f"{'★ ' if game.get('favorite') else ''}{game['display_title']}\n{console}")
+                tile_text = f"{'★ ' if game.get('favorite') else ''}{game['display_title']}\n{console}"
+                if is_ps4_package(game) or state == WINUAE_CONFIG_STATUS:
+                    tile_text += f"\n{state}"
+                tile_icon = QIcon() if is_ps4_package(game) else cover_icon(self.service, game["id"])
+                tile = QListWidgetItem(tile_icon, tile_text)
                 tile.setData(Qt.ItemDataRole.UserRole, game["id"])
-                tile.setToolTip(f"{game['display_title']} · {state}\nRechtsklick: Start, Details, Cover & Infos")
+                action_text = "Paketinstallation, Details, Cover & Infos" if is_ps4_package(game) else "Start, Details, Cover & Infos"
+                tile.setToolTip(f"{game['display_title']} · {state}\nRechtsklick: {action_text}")
                 self.grid.addItem(tile)
                 if game["id"] == selected:
                     self.grid.setCurrentItem(tile)
             group.setExpanded(True)
-        self.results_label.setText(f"{len(games)} Spiele · nach Konsole gruppiert")
+        noun = "Einträge" if any(is_ps4_package(game) for game in games) else "Spiele"
+        self.results_label.setText(f"{len(games)} {noun} · nach Konsole gruppiert")
         self.empty_label.setVisible(not games)
-        if self.service.library.games and not games:
+        if self.service.library.visible_games and not games:
             self.empty_label.setText("Keine Spiele für diese Suche gefunden. Passe die Suche oder Filter an.")
         else:
             self.empty_label.setText("Wähle in den Einstellungen einen oder mehrere Ordner mit deinen eigenen Spiel-Dateien und starte einen Scan.")
@@ -292,6 +345,7 @@ class LibraryPage(QWidget):
 class SettingsPage(QWidget):
     foldersChanged = Signal(list)
     scanRequested = Signal()
+    showHiddenChanged = Signal(bool)
 
     def __init__(self, service, parent=None):
         super().__init__(parent)
@@ -307,6 +361,10 @@ class SettingsPage(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(14)
         layout.addWidget(label("Einstellungen", "sectionTitle"))
+        self.show_hidden = QCheckBox("Ausgeblendete Einträge anzeigen")
+        self.show_hidden.setChecked(service.settings.get("show_hidden", False))
+        self.show_hidden.toggled.connect(self.showHiddenChanged.emit)
+        layout.addWidget(self.show_hidden)
         layout.addWidget(label("Ordner mit eigenen Spiel-Dateien", "cardTitle"))
         layout.addWidget(label("Der Scan durchsucht Unterordner und übernimmt nur Dateipfade und Metadaten. Spiele werden weder kopiert noch verändert. Mehrdeutige Dateiendungen ordnest du anschließend in der Bibliothek einer Konsole zu.", "muted"))
         self.folders = QListWidget()
@@ -349,6 +407,7 @@ class SettingsPage(QWidget):
             self.foldersChanged.emit(self.roots())
 
     def set_busy(self, busy):
+        self.show_hidden.setEnabled(not busy)
         for button in (self.add_button, self.remove_button, self.scan_button):
             button.setEnabled(not busy)
         self.cover_panel.set_busy(busy)

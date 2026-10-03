@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "ram_tolerance_gb": 0.5,
-  "disclaimer": "Grobe Einschätzung anhand von CPU-Kernen, RAM und GPU-Klasse – keine Garantie. Takt, Architektur, Treiber, Auflösung und einzelne Spiele können das Ergebnis stark verändern.",
+  "disclaimer": "Grobe Einschätzung anhand von CPU-Kernen, RAM und GPU-Klasse – keine Garantie. Takt, Architektur, Treiber, Auflösung und einzelne Spiele können das Ergebnis stark verändern. Auch bei ausreichender Hardware hängt PlayStation 4 mit shadPS4 von der beschränkten Spielekompatibilität und der eigenen Einrichtung ab. Amiga mit WinUAE ist als Niedrig eingeordnet; gewähltes Amiga-Modell, CPU-/JIT-Einstellungen und aufwendige Erweiterungen können mehr Leistung benötigen. Ausgeblendete Einträge werden nur bei aktivierter Anzeige beurteilt.",
   "gpu_classes": {
     "unknown": 0,
     "integrated": 1,

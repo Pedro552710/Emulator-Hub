@@ -23,9 +23,9 @@
     ".vpk": "PS Vita",
     ".elf": ["PlayStation 2", "PlayStation 3"],
     ".self": "PlayStation 3",
-    ".iso": ["GameCube / Wii", "PlayStation 1", "PlayStation 2", "PSP", "Saturn", "Dreamcast", "Xbox (Original)", "Xbox 360"],
-    ".cue": ["PlayStation 1", "Saturn", "PC Engine / TurboGrafx"],
-    ".bin": ["PlayStation 1", "PlayStation 3", "Saturn", "Master System / Mega Drive", "Atari 2600", "PC Engine / TurboGrafx"],
+    ".iso": ["GameCube / Wii", "PlayStation 1", "PlayStation 2", "PSP", "Saturn", "Dreamcast", "Xbox (Original)", "Xbox 360", "Amiga (A500, A1200, CD32 …)"],
+    ".cue": ["PlayStation 1", "Saturn", "PC Engine / TurboGrafx", "Amiga (A500, A1200, CD32 …)"],
+    ".bin": ["PlayStation 1", "PlayStation 3", "PlayStation 4", "Saturn", "Master System / Mega Drive", "Atari 2600", "PC Engine / TurboGrafx"],
     ".chd": ["PlayStation 1", "PlayStation 2", "Saturn", "Dreamcast", "PC Engine / TurboGrafx", "Neo Geo / Arcade"],
     ".cso": ["PSP", "PlayStation 2"],
     ".gen": "Master System / Mega Drive",
@@ -35,6 +35,13 @@
     ".gdi": "Dreamcast",
     ".zip": ["Neo Geo / Arcade", "NES", "SNES", "Game Boy / GBC", "Game Boy Advance", "Master System / Mega Drive", "Atari 2600", "PC Engine / TurboGrafx"],
     ".a26": "Atari 2600",
-    ".pce": "PC Engine / TurboGrafx"
+    ".pce": "PC Engine / TurboGrafx",
+    ".adf": "Amiga (A500, A1200, CD32 …)",
+    ".adz": "Amiga (A500, A1200, CD32 …)",
+    ".dms": "Amiga (A500, A1200, CD32 …)",
+    ".ipf": "Amiga (A500, A1200, CD32 …)",
+    ".hdf": "Amiga (A500, A1200, CD32 …)",
+    ".lha": "Amiga (A500, A1200, CD32 …)",
+    ".uae": "Amiga (A500, A1200, CD32 …)"
   }
 }

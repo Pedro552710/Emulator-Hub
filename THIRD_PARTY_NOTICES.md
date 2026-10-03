@@ -4,6 +4,12 @@ Stand: **02.10.2026**. Grundlage sind `requirements.txt`, `requirements.lock.txt
 
 **Es werden keine Emulatoren mitgeliefert.** Vom Benutzer separat heruntergeladene Emulatoren unterliegen ihren eigenen Lizenzen und Installationsbedingungen. ROMs, Spiele, BIOS-/Firmware-Dateien und fremde Cover gehören weder ins Repository noch in die Release-Pakete. Dienstinhalte aus IGDB/ScreenScraper sind nicht durch die MIT-Lizenz des Projekts freigegeben.
 
+## Optionales externes Hilfsprogramm
+
+**PS4 PKG Tool von pearlxcore** ist ein separat heruntergeladenes Drittprogramm und wird weder in diesem Repository noch in Hub-Release-Paketen eingebettet. Für den am **03.10.2026** geprüften stabilen Release **v1.8.0** gilt die [GNU GPL, Version 3](https://github.com/pearlxcore/PS4PKGTool/blob/v1.8.0/LICENSE). [Offizielles Projekt und Originalquellen](https://github.com/pearlxcore/PS4PKGTool/tree/v1.8.0), [Releases](https://github.com/pearlxcore/PS4PKGTool/releases). Der frühere Name `pearlxcore/PS4-PKG-Tool` leitet auf dieses unverändert offizielle Repository um.
+
+Der Hub startet ausschließlich die separat installierte EXE, bei Paketübergabe mit einem eigenen Dateipfad als Argument. Er enthält keinen Tool-Code und keine PS4-Paketverarbeitung, Schlüssel oder Key-Dateien. Die MIT-Lizenz des Hubs ändert die GPL-3.0-Lizenz des Tools nicht. Das Tool benötigt laut Projekt .NET 10 Windows Desktop Runtime; diese wird ebenfalls nicht vom Hub automatisch installiert. Bei eigener Weitergabe des Tools dessen vollständige Lizenz-, Copyright- und Quellcodepflichten beachten.
+
 ## Direkte Abhängigkeiten
 
 | Paket | Getestete Version | Lizenz | Primärquelle |

@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
 )
 
 from core.controllers import ControllerService, XInputBackend
+from core.catalog import visible_items
 from core.errors import HubError
 from .dialogs import label
 from .worker import Worker
@@ -52,7 +53,9 @@ class ControllerDialog(QDialog):
         layout.addWidget(label("Tastenbelegung im Emulator", "cardTitle"))
         self.emulator_combo = QComboBox()
         self.emulator_combo.setAccessibleName("Emulator für die Controller-Einrichtung")
-        for entry in service.catalog.items:
+        emulators = [entry for entry in visible_items(service.catalog, service.settings.get("show_hidden", False)) if entry.get("entry_type") != "utility"
+                     and (not entry.get("deprecated") or entry["id"] in service.installed or entry.get("hidden"))]
+        for entry in emulators:
             suffix = " · Automatik für GameCube-Port 1" if self.controllers.can_auto(entry["id"]) else " · manuell"
             self.emulator_combo.addItem(entry["emulator"] + suffix, entry["id"])
         self.emulator_combo.currentIndexChanged.connect(self._emulator_changed)
@@ -107,7 +110,7 @@ class ControllerDialog(QDialog):
         self.poll_timer.timeout.connect(self._poll)
         self._poll()
         self._emulator_changed()
-        preferred = next((index for index, entry in enumerate(service.catalog.items)
+        preferred = next((index for index, entry in enumerate(emulators)
                           if self.controllers.can_auto(entry["id"]) and service.is_installed(entry["id"])), 0)
         self.emulator_combo.setCurrentIndex(preferred)
         self.poll_timer.start()

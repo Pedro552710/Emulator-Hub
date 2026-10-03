@@ -7,7 +7,7 @@ import threading
 from .errors import HubError
 from .state import read_json, write_json
 
-DEFAULTS = {"schema_version": 1, "favorites": [], "recent_emulators": [], "game_folders": []}
+DEFAULTS = {"schema_version": 1, "favorites": [], "recent_emulators": [], "game_folders": [], "show_hidden": False}
 
 
 class SettingsStore:
@@ -18,6 +18,8 @@ class SettingsStore:
         if not isinstance(loaded, dict) or loaded.get("schema_version", 1) != 1:
             raise HubError("settings.json enthält keine gültigen Einstellungen.")
         self._data = {**copy.deepcopy(DEFAULTS), **loaded}
+        if type(self._data["show_hidden"]) is not bool:
+            raise HubError("settings.json: 'show_hidden' muss ein boolescher Wert sein.")
         for key in ("favorites", "game_folders"):
             if not isinstance(self._data[key], list) or any(not isinstance(v, str) for v in self._data[key]):
                 raise HubError(f"settings.json: '{key}' muss eine Liste mit Texten sein.")
@@ -32,6 +34,8 @@ class SettingsStore:
             return copy.deepcopy(self._data.get(key, default))
 
     def set(self, key, value):
+        if key == "show_hidden" and type(value) is not bool:
+            raise HubError("'show_hidden' muss ein boolescher Wert sein.")
         with self.lock:
             data = {**self._data, key: copy.deepcopy(value)}
             write_json(self.path, data, "Einstellungen")

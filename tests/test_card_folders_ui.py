@@ -6,7 +6,7 @@ from unittest.mock import Mock, call, patch
 
 from PySide6.QtCore import QCoreApplication, QEvent, QPoint
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QLabel
 
 from core.catalog import Catalog
 from core.errors import HubError
@@ -26,6 +26,7 @@ class CardFolderUiTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.catalog = Catalog()
         self.service = HubService(self.catalog, self.root / "data")
+        self.service.settings.set("show_hidden", True)  # PS4-Funktionen bleiben ausdrücklich testbar.
         self.documents_patch = patch("core.folders._windows_documents", return_value=self.root / "Dokumente")
         self.documents_patch.start()
         report = {"cpu_cores": 8, "ram_gb": 32, "gpu_score": 3}
@@ -132,6 +133,34 @@ class CardFolderUiTests(unittest.TestCase):
         ) as save:
             self.window.change_games_folder(self.entry)
         save.assert_not_called()
+
+    def test_legacy_shadps4_cards_mark_deprecation_and_keep_existing_start_modes(self):
+        entry = self.catalog.by_id("shadps4")
+        own = self.root / "Eigener PS4-Emulator"
+        own.mkdir()
+        core = own / "shadPS4.exe"
+        core.write_bytes(windows_executable())
+        self.service.register_manual(entry, own)
+        self.window.refresh()
+        for card in (self.window.cards[entry["id"]], self.window.recent_cards[entry["id"]]):
+            explanation = " ".join(label.text() for label in card.findChildren(QLabel))
+            self.assertIn("QTLauncher", explanation)
+            self.assertIn("Veraltet", explanation)
+            self.assertIn("PS4 PKG Tool", explanation)
+            self.assertNotIn("Big-Picture", explanation)
+            self.assertNotIn("-b", explanation)
+            self.assertTrue(card.install_button.isHidden())
+        with patch("core.installer.subprocess.Popen") as start, patch.object(self.window, "_notify") as notify:
+            self.window.cards[entry["id"]].start_button.click()
+        start.assert_called_once_with([str(core), "-b"], cwd=own, shell=False)
+        self.assertIn("Big-Picture", notify.call_args.args[0])
+        launcher = own / "qtlauncher" / "shadPS4QtLauncher.exe"
+        launcher.parent.mkdir()
+        launcher.write_bytes(windows_executable())
+        with patch("core.installer.subprocess.Popen") as start, patch.object(self.window, "_notify") as notify:
+            self.window.recent_cards[entry["id"]].start_button.click()
+        start.assert_called_once_with([str(launcher)], cwd=launcher.parent, shell=False)
+        self.assertIn("QTLauncher", notify.call_args.args[0])
 
 
 if __name__ == "__main__":

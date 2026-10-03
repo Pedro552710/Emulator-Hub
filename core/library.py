@@ -12,8 +12,15 @@ import stat
 import threading
 
 from .errors import HubError, Cancelled
-from .paths import config_path as resolve_config_path
+from .catalog import hidden_consoles, visible_items
+from .paths import config_path as resolve_config_path, resource_path
 from .state import read_json, write_json
+
+
+PS4_PACKAGE_STATUS = "Im PS4 PKG Tool installieren"
+PS4_CONSOLE = "PlayStation 4"
+AMIGA_CONSOLE = "Amiga (A500, A1200, CD32 …)"
+WINUAE_CONFIG_STATUS = "Über WinUAE-Konfiguration zu starten"
 
 
 def _path_key(path):
@@ -28,6 +35,22 @@ def _is_link(path):
     return path.is_symlink() or bool(
         getattr(details, "st_file_attributes", 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT
     )
+
+
+def is_ps4_package(game_or_path):
+    """PKG-Dateien werden nur an das externe Hilfsprogramm übergeben."""
+    path = game_or_path.get("path", "") if isinstance(game_or_path, dict) else game_or_path
+    return Path(path).suffix.casefold() == ".pkg"
+
+
+def game_status(game):
+    if is_ps4_package(game):
+        return PS4_PACKAGE_STATUS
+    if game.get("missing"):
+        return "Datei fehlt"
+    if game.get("console") == AMIGA_CONSOLE and Path(game.get("path", "")).suffix.casefold() != ".uae":
+        return WINUAE_CONFIG_STATUS
+    return "Bereit" if game.get("console") else "Konsole wählen"
 
 
 class LibraryStore:
@@ -57,8 +80,22 @@ class LibraryStore:
             ):
                 raise HubError("Die Dateiendungs-Konfiguration enthält eine ungültige Endung oder Konsolenliste.")
             self.extensions[suffix] = list(values)
+        # Auch ältere lokale Konfigurationen erkennen Pakete; sie sind keine Spielstarts.
+        self.extensions[".pkg"] = [PS4_CONSOLE]
+        if any(entry["id"] == "winuae" for entry in catalog.items):
+            # Extend old defaults in memory; keep the user's configuration file
+            # and individually changed mappings intact.
+            defaults = read_json(resource_path("configs/extensions.json"), {}, "Die Amiga-Standarddateiendungen")
+            for suffix, consoles in defaults.get("extensions", {}).items():
+                values = [consoles] if isinstance(consoles, str) else consoles
+                if AMIGA_CONSOLE not in values:
+                    continue
+                legacy = [console for console in values if console != AMIGA_CONSOLE]
+                if suffix not in self.extensions or self.extensions[suffix] == legacy:
+                    self.extensions[suffix] = list(values)
         self.supported_consoles = sorted(
-            {e["konsole"] for e in catalog.items} | {c for values in self.extensions.values() for c in values},
+            {e["konsole"] for e in catalog.items if e.get("entry_type") != "utility"}
+            | {c for values in self.extensions.values() for c in values},
             key=str.casefold,
         )
         raw = read_json(self.path, {"schema_version": 1, "games": []}, "Die Spielebibliothek")
@@ -93,6 +130,9 @@ class LibraryStore:
             if game["id"] in games or key in paths:
                 raise HubError("Die Spielebibliothek enthält doppelte IDs oder Dateipfade.")
             games[game["id"]] = deepcopy(game)
+            if is_ps4_package(game):
+                games[game["id"]].update({"console": PS4_CONSOLE, "candidates": [PS4_CONSOLE],
+                                         "emulator_id": None, "package_kind": "ps4_pkg", "launchable": False})
             paths.add(key)
         return games
 
@@ -100,6 +140,31 @@ class LibraryStore:
     def games(self):
         with self._lock:
             return deepcopy(list(self._games.values()))
+
+    def _game_visible(self, game):
+        show_hidden = self.settings.get("show_hidden", False)
+        hidden = hidden_consoles(self.catalog, show_hidden)
+        hidden_ids = {entry["id"] for entry in self.catalog.items
+                      if entry.get("hidden") and not show_hidden}
+        candidates = game.get("candidates", [])
+        return not (
+            game.get("console") in hidden or game.get("emulator_id") in hidden_ids
+            or is_ps4_package(game) and PS4_CONSOLE in hidden
+            or not game.get("console") and candidates and all(console in hidden for console in candidates)
+        )
+
+    @property
+    def visible_games(self):
+        hidden = hidden_consoles(self.catalog, self.settings.get("show_hidden", False))
+        games = [game for game in self.games if self._game_visible(game)]
+        for game in games:
+            game["candidates"] = [console for console in game.get("candidates", []) if console not in hidden]
+        return games
+
+    @property
+    def visible_supported_consoles(self):
+        hidden = hidden_consoles(self.catalog, self.settings.get("show_hidden", False))
+        return [console for console in self.supported_consoles if console not in hidden]
 
     def get_game(self, game_id):
         with self._lock:
@@ -139,7 +204,32 @@ class LibraryStore:
         def walk_error(error):
             report_error(f"Ordner konnte nicht gelesen werden: {error.filename or '?'} ({error.strerror or error})")
 
-        for value in roots:
+        scan_roots = [(value, False) for value in roots]
+        # PS4-Zuordnungen ergänzen nur Paketdateien. Andere Dateien werden
+        # weiterhin nur unter den ausdrücklich gewählten Scanordnern erfasst.
+        from .folders import games_directories, games_directory
+        try:
+            configured_directories = games_directories(self.settings)
+        except HubError as exc:
+            report_error(f"PS4-Spiele-Ordner konnten nicht gelesen werden: {exc}")
+            configured_directories = {}
+        for entry in visible_items(self.catalog, self.settings.get("show_hidden", False)):
+            check_cancel()
+            ps4_entry = entry["id"] == "ps4-pkg-tool" or (
+                entry.get("entry_type") != "utility" and (
+                    entry["konsole"] == PS4_CONSOLE or PS4_CONSOLE in entry.get("supported_consoles", [])
+                )
+            )
+            if entry["id"] not in configured_directories or not ps4_entry:
+                continue
+            try:
+                folder = games_directory(entry, self.settings, self.catalog)
+                if folder.is_dir():
+                    scan_roots.append((folder, True))
+            except (HubError, OSError) as exc:
+                report_error(f"PS4-Spiele-Ordner konnte nicht gelesen werden: {exc}")
+
+        for value, packages_only in scan_roots:
             check_cancel()
             folder = Path(value).absolute()
             try:
@@ -178,7 +268,10 @@ class LibraryStore:
                         check_cancel()
                         path = current_path / name
                         suffix = path.suffix.lower()
-                        if suffix not in self.extensions:
+                        if suffix not in self.extensions or (packages_only and suffix != ".pkg"):
+                            continue
+                        hidden = hidden_consoles(self.catalog, self.settings.get("show_hidden", False))
+                        if all(console in hidden for console in self.extensions[suffix]):
                             continue
                         try:
                             if _is_link(path) or not path.is_file():
@@ -210,12 +303,16 @@ class LibraryStore:
                     games[identifier] = game
                     by_path[key] = game
                     added += 1
-                elif not game.get("assigned_manually"):
+                elif is_ps4_package(path) or not game.get("assigned_manually"):
                     game["console"] = candidates[0] if len(candidates) == 1 else None
+                if is_ps4_package(path):
+                    game.update({"emulator_id": None, "package_kind": "ps4_pkg", "launchable": False})
                 game.update({"path": str(path), "candidates": list(candidates), "missing": False})
                 progress(int(index / max(1, len(files)) * 100), f"Bibliothek erfassen · {index} / {len(files)}")
             for game in games.values():
                 check_cancel()
+                if not self._game_visible(game):
+                    continue
                 try:
                     game["missing"] = not Path(game["path"]).is_file() or _is_link(game["path"])
                 except OSError:
@@ -233,7 +330,9 @@ class LibraryStore:
         if console not in self.supported_consoles:
             raise HubError("Bitte eine Konsole aus der Liste auswählen.")
         with self._lock:
-            self.get_game(game_id)
+            game = self.get_game(game_id)
+            if is_ps4_package(game) and console != PS4_CONSOLE:
+                raise HubError("PS4-Pakete gehören zur PlayStation 4 und können nicht als Spiel einer anderen Konsole gestartet werden.")
             games = deepcopy(self._games)
             games[game_id].update({"console": console, "assigned_manually": True, "emulator_id": None})
             self._save(games)
@@ -259,6 +358,8 @@ class LibraryStore:
     def launch_game(self, game_id, emulator_id=None):
         self.last_warning = ""
         game = self.get_game(game_id)
+        if is_ps4_package(game):
+            raise HubError(f"{PS4_PACKAGE_STATUS}; PKG-Dateien sind nicht direkt startbar.")
         if game["console"] is None:
             raise HubError("Diese Dateiendung ist mehrdeutig. Bitte zuerst die Konsole für das Spiel zuordnen.")
         if self.launcher is None:

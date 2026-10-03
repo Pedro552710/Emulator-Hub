@@ -25,6 +25,10 @@ def _quote(value):
 
 
 def create_shortcuts(entry, executable, choices):
+    from .launch import build_emulator_command
+    command, _ = build_emulator_command(entry, executable)
+    executable = Path(command[0])
+    arguments = subprocess.list2cmdline(command[1:])
     folders = shortcut_folders()
     paths = []
     for choice, folder in folders.items():
@@ -35,6 +39,7 @@ def create_shortcuts(entry, executable, choices):
         script = ("$ErrorActionPreference='Stop'; $w=New-Object -ComObject WScript.Shell; "
                   f"$s=$w.CreateShortcut({_quote(target)}); "
                   f"$s.TargetPath={_quote(executable)}; "
+                  f"$s.Arguments={_quote(arguments)}; "
                   f"$s.WorkingDirectory={_quote(Path(executable).parent)}; "
                   f"$s.Description={_quote(entry['emulator'])}; $s.Save()")
         encoded = base64.b64encode(script.encode("utf-16le")).decode("ascii")

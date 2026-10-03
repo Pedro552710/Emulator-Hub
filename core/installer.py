@@ -1,5 +1,7 @@
 """Download, Integritätsprüfung und transaktionale portable Installation."""
 from datetime import datetime, timezone
+from dataclasses import dataclass
+import copy
 import hashlib
 import logging
 from logging.handlers import RotatingFileHandler
@@ -30,6 +32,19 @@ from .portable import portable_enabled, portable_data_dir
 
 MAX_DOWNLOAD = 2 * 1024 ** 3
 SETTINGS_EXTENSIONS = {".ini", ".cfg", ".json", ".toml", ".yaml", ".yml", ".xml"}
+
+
+@dataclass(frozen=True)
+class DownloadPreview:
+    """Reviewed download metadata; the archive is fetched only after a UI click."""
+
+    entry_id: str
+    source: str
+    version: str
+    asset_name: str
+    sha256: str | None
+    notice: str
+    token: str
 
 
 def default_data_dir():
@@ -93,6 +108,7 @@ class HubService:
         self.installed_path = self.data_dir / "installed.json"
         self.installed = read_installed(self.installed_path)
         self.latest_versions = {}
+        self._download_previews = {}
         self.policy = URLPolicy(catalog.official_sources)
         self.github = GitHubClient(self.policy)
         self.winget = WingetClient(self.policy)
@@ -119,6 +135,9 @@ class HubService:
 
     def _launch_game(self, game, emulator_id=None):
         from .launch import compatible_entries, launch_game
+        from .library import is_ps4_package
+        if is_ps4_package(game):
+            raise HubError("Im PS4 PKG Tool installieren; PKG-Dateien sind nicht direkt startbar.")
         candidates = compatible_entries(self.catalog, game["console"])
         if not candidates:
             raise HubError("Für diese Konsole ist noch kein Emulator im Katalog hinterlegt.")
@@ -141,6 +160,15 @@ class HubService:
         if getattr(self.library, "last_warning", ""):
             self.logger.warning(self.library.last_warning)
         return result
+
+    def open_ps4_package(self, game_id):
+        from .launch import open_ps4_package
+        from .library import is_ps4_package
+        game = self.library.get_game(game_id)
+        if not is_ps4_package(game):
+            raise HubError("Bitte ein PS4-Paket aus der Bibliothek auswählen. Das Hilfsprogramm ist nur für eigene PKG-Dateien vorgesehen.")
+        entry = self.catalog.by_id("ps4-pkg-tool")
+        return open_ps4_package(self, entry, game["path"])
 
     def systemcheck(self, progress, log, cancel_event):
         self.thresholds = load_thresholds(self.data_dir)
@@ -186,7 +214,17 @@ class HubService:
             checked = self.check_updates(lambda value, phase: progress(int(max(0, value) * .2), phase), log, cancel_event)
             result = {"updated": [], "failed": {}, "skipped": [], "cancelled": False}
             candidates = []
-            for entry in self.catalog.items:
+            for entry in self.catalog.visible_items(self.settings.get("show_hidden", False)):
+                if entry.get("deprecated"):
+                    if entry["id"] in self.installed:
+                        result["skipped"].append(entry["id"])
+                        self._log(log, entry["deprecated_note"])
+                    continue
+                if entry.get("entry_type") == "utility":
+                    if entry["id"] in self.installed:
+                        result["skipped"].append(entry["id"])
+                        self._log(log, f"{entry['emulator']}: Hilfsprogramme nur nach ausdrücklichem Installationsklick aktualisieren.")
+                    continue
                 record = self.installed.get(entry["id"])
                 if not record:
                     continue
@@ -280,6 +318,7 @@ class HubService:
             raise HubError("Der Standardbrowser konnte nicht geöffnet werden.")
 
     def start(self, entry):
+        from .launch import build_emulator_command
         record = self.installed.get(entry["id"])
         if not record or not self.is_installed(entry["id"]):
             raise HubError("Die Startdatei wurde nicht gefunden. Bitte den Emulator erneut installieren oder den Ordner zuordnen.")
@@ -287,13 +326,26 @@ class HubService:
         if not executable.is_relative_to(Path(record["path"]).resolve()):
             raise HubError("Die Startdatei liegt außerhalb des gespeicherten Emulatorordners.")
         verify_windows_executable(executable, require_x64=False)
+        command, note = build_emulator_command(entry, executable)
         try:
-            subprocess.Popen([str(executable)], cwd=executable.parent, shell=False)
-            self.logger.info("%s gestartet", entry["emulator"])
             try:
-                self.settings.touch_emulator(entry["id"])
-            except HubError as exc:
-                self.logger.warning("Emulator gestartet, Verlauf konnte nicht gespeichert werden: %s", exc)
+                subprocess.Popen(command, cwd=Path(command[0]).parent, shell=False)
+            except OSError as exc:
+                if Path(command[0]) == executable or not entry.get("launcher"):
+                    raise
+                self.logger.warning("QTLauncher konnte nicht gestartet werden: %s", exc)
+                command, note = build_emulator_command(entry, executable, prefer_launcher=False)
+                subprocess.Popen(command, cwd=executable.parent, shell=False)
+                note = "QTLauncher konnte nicht gestartet werden. shadPS4 startet im Big-Picture-Modus (-b). Bitte die manuelle Launcher-Einrichtung prüfen."
+            self.logger.info("%s gestartet", entry["emulator"])
+            if note:
+                self.logger.info("%s", note)
+            if entry.get("entry_type") != "utility":
+                try:
+                    self.settings.touch_emulator(entry["id"])
+                except HubError as exc:
+                    self.logger.warning("Emulator gestartet, Verlauf konnte nicht gespeichert werden: %s", exc)
+            return note
         except OSError as exc:
             raise HubError(f"Der Emulator konnte nicht gestartet werden: {exc}") from None
 
@@ -381,11 +433,48 @@ class HubService:
                 return match[2].lower()
         raise HubError("Die veröffentlichte SHA-256-Prüfsumme konnte nicht eindeutig gelesen werden. Installation gestoppt.")
 
-    def install(self, entry, progress_callback, log_callback, cancel_event, shortcuts=None):
+    def prepare_install(self, entry):
+        """Resolve a stable utility release without downloading its executable archive."""
         with self._lock:
-            return self._install(entry, progress_callback, log_callback, cancel_event, shortcuts or {})
+            if entry.get("deprecated"):
+                raise HubError(entry["deprecated_note"])
+            if entry.get("entry_type") != "utility" or entry.get("install_methode") != "auto_github":
+                raise HubError("Für dieses Hilfsprogramm bitte die manuelle Anleitung verwenden.")
+            release = self.github.latest(entry["github_repo"], force=True)
+            asset = self.github.asset(entry, release)
+            expected = self._checksum(entry, release, asset)
+            if not expected:
+                raise HubError("Die offizielle Quelle veröffentlicht für dieses Asset keine SHA-256-Prüfsumme. Bitte die manuelle Anleitung verwenden; das Hilfsprogramm wird nicht automatisch heruntergeladen.")
+            checksum = f"SHA-256 der offiziellen Quelle: {expected}"
+            source = asset["browser_download_url"]
+            notice = (f"{entry['emulator']} ist ein Drittprogramm und stammt nicht vom Emulator-Hub-Projekt.\n\n"
+                      f"Quelle: {source}\nRelease: {release['tag_name']}\nDatei: {asset['name']}\n{checksum}\n\n"
+                      "Antivirusprogramme können bei unsignierten Programmen warnen. "
+                      "Der Hub lädt das Programm erst nach deinem ausdrücklichen Installationsklick herunter.\n"
+                      "PS4 PKG Tool benötigt die separat vorhandene .NET 10 Desktop Runtime; Lizenz: GPL-3.0.")
+            preview = DownloadPreview(entry["id"], source, release["tag_name"], asset["name"],
+                                      expected, notice, uuid.uuid4().hex)
+            # Keep the release private so callers cannot replace the reviewed URL or hash.
+            self._download_previews = {preview.token: (preview, entry["github_repo"],
+                                                       copy.deepcopy(release), copy.deepcopy(asset))}
+            return preview
 
-    def _install(self, entry, progress, log, cancel_event, shortcuts):
+    def install(self, entry, progress_callback, log_callback, cancel_event, shortcuts=None, *, preview=None):
+        with self._lock:
+            if entry.get("deprecated"):
+                raise HubError(entry["deprecated_note"])
+            prepared = None
+            if entry.get("entry_type") == "utility":
+                prepared = self._download_previews.get(getattr(preview, "token", None))
+                if (not prepared or prepared[0] != preview or preview.entry_id != entry["id"]
+                        or prepared[1] != entry.get("github_repo")):
+                    raise HubError("Dieses Drittprogramm benötigt zuerst den Downloadhinweis und einen ausdrücklichen Installationsklick. Bitte Installieren wählen.")
+                self._download_previews.pop(preview.token)
+            return self._install(entry, progress_callback, log_callback, cancel_event, shortcuts or {}, prepared)
+
+    def _install(self, entry, progress, log, cancel_event, shortcuts, prepared=None):
+        if entry.get("deprecated"):
+            raise HubError(entry["deprecated_note"])
         method = entry["install_methode"]
         if method == "manuell":
             raise HubError("Für diesen Emulator ist eine manuelle Einrichtung vorgesehen. Bitte die Anleitung verwenden.")
@@ -427,14 +516,23 @@ class HubService:
             raise Cancelled()
         progress(-1, "Offizielles Release ermitteln …")
         if method == "auto_github":
-            release = self.github.latest(entry["github_repo"])
-            asset = self.github.asset(entry, release)
+            release = prepared[2] if prepared else self.github.latest(entry["github_repo"])
+            asset = prepared[3] if prepared else self.github.asset(entry, release)
             url, filename, version = asset["browser_download_url"], asset["name"], release["tag_name"]
         elif method == "auto_direct":
-            url = entry.get("direct_url", "")
-            self.policy.validate(url)
-            filename = Path(url.split("?")[0]).name or "download.zip"
-            version = entry.get("direct_version", "unbekannt")
+            if entry.get("direct_resolver") == "winuae":
+                from .direct import resolve_winuae
+                direct = resolve_winuae(self.policy, entry, cancel_event)
+                url, filename, version = direct.url, direct.name, direct.version
+                if (previous and previous["version"] not in ("", "unbekannt", "manuell")
+                        and _version_newer(previous["version"], version)):
+                    self.latest_versions.pop(entry["id"], None)
+                    raise HubError("WinUAE: Die ermittelte Version ist älter als die installierte. Bitte manuell prüfen.")
+            else:
+                url = entry.get("direct_url", "")
+                self.policy.validate(url)
+                filename = Path(url.split("?")[0]).name or "download.zip"
+                version = entry.get("direct_version", "unbekannt")
         else:
             raise HubError("Unbekannte Installationsmethode. Bitte den Katalog prüfen.")
         if Path(filename).name != filename or any(c in filename for c in ':\\/'):
@@ -446,7 +544,7 @@ class HubService:
         work = Path(tempfile.mkdtemp(prefix=f"_install_{entry['id']}_", dir=self.emulator_dir))
         try:
             archive = work / filename
-            expected = self._checksum(entry, release, asset)
+            expected = prepared[0].sha256 if prepared else self._checksum(entry, release, asset)
             actual = self._download(url, archive, progress, cancel_event, asset.get("size") if asset else None)
             if expected:
                 if actual != expected:
@@ -466,7 +564,11 @@ class HubService:
                 raise HubError("Der offizielle Installer wurde gestartet. Nach Abschluss bitte über die Anleitung den installierten Ordner auswählen.")
             progress(86, "Archiv sicher entpacken …")
             content = work / "content"
-            extract_archive(archive, content, kind, cancel_event)
+            if entry.get("direct_resolver") == "winuae":
+                extract_archive(archive, content, kind, cancel_event,
+                                progress=lambda fraction: progress(86 + int(8 * fraction), "WinUAE entpacken …"))
+            else:
+                extract_archive(archive, content, kind, cancel_event)
             executable = find_executable(content, entry)
             verify_windows_executable(executable)
             relative_exe = executable.relative_to(content)
@@ -506,6 +608,8 @@ class HubService:
                 self._log(log, str(exc))
             progress(100, f"{entry['emulator']} ist installiert.")
             self._log(log, f"Installation abgeschlossen: {target}")
+            if entry.get("launcher", {}).get("install_methode") == "manuell":
+                self._log(log, entry["launcher"]["note"])
             return record
         except Exception as exc:
             if swapped and not saved:
@@ -572,7 +676,8 @@ class HubService:
             self._log(log_callback, f"{entry['emulator']}: " + ("deinstalliert." if record.get("managed") else "Zuordnung entfernt; persönliche Dateien bleiben erhalten."))
 
     def check_updates(self, progress_callback, log_callback, cancel_event):
-        entries = [e for e in self.catalog.items if e["id"] in self.installed]
+        entries = [e for e in self.catalog.visible_items(self.settings.get("show_hidden", False))
+                   if e["id"] in self.installed and e.get("entry_type") != "utility" and not e.get("deprecated")]
         releases = {}
         result = {}
         for index, entry in enumerate(entries):
@@ -581,6 +686,22 @@ class HubService:
             progress_callback(int(index / max(1, len(entries)) * 100), f"Updates prüfen · {entry['emulator']}")
             repo = entry.get("github_repo")
             record = self.installed[entry["id"]]
+            if entry.get("direct_resolver") == "winuae":
+                from .direct import resolve_winuae
+                try:
+                    version = resolve_winuae(self.policy, entry, cancel_event).version
+                    self.latest_versions[entry["id"]] = version
+                    result[entry["id"]] = version
+                    if record["version"] in ("unbekannt", "manuell", ""):
+                        self._log(log_callback, f"{entry['emulator']}: aktuell {version}; installierte Version unbekannt, bitte manuell prüfen.")
+                    else:
+                        self._log(log_callback, f"{entry['emulator']}: installiert {record['version']}, aktuell {version}.")
+                except Cancelled:
+                    raise
+                except HubError as exc:
+                    self.latest_versions.pop(entry["id"], None)
+                    self._log(log_callback, f"{entry['emulator']}: manuell prüfen. {exc}")
+                continue
             if record.get("method") == "winget":
                 version = entry.get("winget_version")
                 if version:

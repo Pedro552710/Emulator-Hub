@@ -4,13 +4,21 @@ Emulator Hub ist eine deutsche Desktop-Anwendung für Windows, die Emulatoren ve
 
 ## Funktionen
 
-- 22 Katalogeinträge in sieben Kategorien, Installation von offiziellen Quellen mit manueller Alternative und gemeinsame Updateprüfung.
+- 23 standardmäßig sichtbare Emulator-Einträge in acht Kategorien, einschließlich **Commodore / Amiga mit WinUAE**; 25 Katalogdatensätze bleiben insgesamt erhalten. Installation von offiziellen Quellen mit manueller Alternative und gemeinsame Emulator-Updateprüfung.
 - Favoriten, zuletzt benutzte Emulatoren, lokale Spielebibliothek mit Suche, Filtern und Spiele-Ordnern.
 - Grober CPU-/GPU-/RAM-Systemcheck mit anpassbaren Schwellen.
 - Optionale Cover und Spielinfos über IGDB oder ScreenScraper, Offline-Cache und Zugangsdaten im Windows-Anmeldeinformationsmanager.
 - Controller-Assistent mit XInput-Livetest; bestätigte automatische Belegung für Dolphin/GameCube-Port 1, sonst manuelle Anleitungen.
 - Vollbild-/Couch-Modus mit Gamepad und Tastatur, BIOS-Prüfung eigener Dateien sowie Sicherung und Wiederherstellung von Spielständen und Einstellungen.
 - Portabler Modus über `portable.flag`.
+
+**PS4 ist vorübergehend ausgeblendet.** shadPS4 und PS4 PKG Tool bleiben im Katalog; **Einstellungen → Ausgeblendete Einträge anzeigen** ist standardmäßig aus und macht sie wieder sichtbar. Ausgeblendete Einträge fehlen auch in Suche, Systemcheck und Spielebibliothek und werden bei **Alle aktualisieren** übersprungen. Installierte Dateien, Einstellungen, Favoriten und eigene Spieleordner bleiben erhalten.
+
+**WinUAE** wird aus dem aktuell stabilen Windows-x64-ZIP der [offiziellen Downloadseite](https://www.winuae.net/download/) automatisch installiert und auf Updates geprüft. Die Seite verlinkt die Programmdateien auf `download.abime.net/winuae/releases/`; Betas bleiben ausgeschlossen. Du brauchst ein eigenes lizenziertes oder selbst gesichertes Kickstart. Der Hub lädt, verlinkt oder bündelt keine Kickstart-ROMs, Spiele oder Workbench-Dateien. Eigene Amiga-Images sind über WinUAE-Konfiguration zu starten; vorbereitete `.uae`-Dateien können direkt geladen werden. [Amiga-Anleitung](docs/user-guide.md#amiga-mit-winuae).
+
+Bei aktivierter Anzeige führt die PS4-Karte über **PS4 einrichten** zum externen [PS4 PKG Tool](https://github.com/pearlxcore/PS4PKGTool). Beim ersten Klick fragt der Hub vor dem offiziellen stabilen Download ausdrücklich nach Bestätigung und zeigt Quelle, SHA-256 und Drittanbieter-/Antivirus-Hinweis. Danach öffnet derselbe Button das Hauptfenster. Die Karte erklärt die fünf Schritte; shadPS4 und QTLauncher werden ausschließlich über **Tools > shadPS4 Manager** im Tool eingerichtet. **Ordner für Spiele-PKGs öffnen** öffnet den eigenen Paketordner. Das Tool benötigt derzeit die .NET-10-Desktop-Laufzeit und steht unter GPL-3.0.
+
+Eigene `.pkg`-Dateien bleiben bei aktivierter Anzeige nicht startbare Bibliothekseinträge mit **Im PS4 PKG Tool installieren**. Die Dateiübergabe öffnet den PKG Viewer; die Installation erfolgt im Tool-Hauptfenster. Vorhandene shadPS4-Installationen bleiben als **veraltet** startbar und werden vom Hub nicht mehr installiert oder aktualisiert. Nutzerdaten bleiben erhalten. [Anleitung](docs/user-guide.md#eigene-ps4-pakete-mit-ps4-pkg-tool).
 
 ## Screenshots
 
@@ -61,6 +69,6 @@ Der Build verwendet PyInstaller im **Ordner-Modus** und erzeugt zusätzlich eine
 
 ## Rechtlicher Hinweis
 
-Das Repository und die Release-Pakete enthalten **keine Emulatoren, ROMs, Spiele, BIOS- oder Firmware-Dateien**. Emulatoren werden bei ausdrücklicher Auswahl von ihren offiziellen Projektquellen geladen oder manuell zugeordnet und unterliegen ihren eigenen Lizenzen. Die Bibliothek speichert nur Pfade und Metadaten zu selbst bereitgestellten Dateien. Verwende nur Dateien, zu deren Nutzung du berechtigt bist.
+Das Repository und die Release-Pakete enthalten **keine Emulatoren, PS4 PKG Tool, ROMs, Spiele, BIOS- oder Firmware-Dateien**. Emulatoren und das Hilfsprogramm werden bei ausdrücklicher Auswahl von ihren offiziellen Projektquellen geladen oder manuell zugeordnet und unterliegen ihren eigenen Lizenzen. Die Bibliothek speichert nur Pfade und Metadaten zu selbst bereitgestellten Dateien. Der Hub entschlüsselt und entpackt keine PS4-Pakete, enthält dafür keine Schlüssel oder Key-Dateien und verändert keinen Kopierschutz. Verwende nur Dateien, zu deren Nutzung du berechtigt bist.
 
 Die MIT-Lizenz gilt für den eigenen Projektcode und das eigene Logo; Rechte an Drittanbieter-Software, Katalognamen, Coverbildern und Dienstinhalten bleiben bei den jeweiligen Rechteinhabern. Nintendo, Sony, Sega, Microsoft und andere genannte Namen gehören ihren Rechteinhabern. Emulator Hub ist ein unabhängiges Projekt und wird von diesen Unternehmen weder unterstützt noch empfohlen.

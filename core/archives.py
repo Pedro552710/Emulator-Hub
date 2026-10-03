@@ -41,7 +41,7 @@ def _validate(members, destination):
             raise HubError("Das Archiv überschreitet die sichere Entpackgröße.")
 
 
-def extract_archive(archive, destination, kind, cancel_event):
+def extract_archive(archive, destination, kind, cancel_event, *, progress=None):
     destination = Path(destination)
     destination.mkdir(parents=True, exist_ok=True)
     try:
@@ -51,6 +51,8 @@ def extract_archive(archive, destination, kind, cancel_event):
             with zipfile.ZipFile(archive) as zf:
                 infos = zf.infolist()
                 _validate([(i.filename, i.file_size, stat.S_ISLNK(i.external_attr >> 16)) for i in infos], destination)
+                total = sum(info.file_size for info in infos)
+                extracted = 0
                 for info in infos:
                     if cancel_event.is_set():
                         raise Cancelled()
@@ -64,6 +66,9 @@ def extract_archive(archive, destination, kind, cancel_event):
                                 if cancel_event.is_set():
                                     raise Cancelled()
                                 dst.write(chunk)
+                                extracted += len(chunk)
+                                if progress is not None:
+                                    progress(extracted / max(1, total))
         elif kind == "7z":
             import py7zr
             with py7zr.SevenZipFile(archive, "r") as zf:

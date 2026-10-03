@@ -24,6 +24,7 @@ core/archives.py
 core/backup.py
 core/catalog.py
 core/controllers.py
+core/direct.py
 core/errors.py
 core/folders.py
 core/github.py
@@ -78,6 +79,8 @@ tests/test_couch_ui.py
 tests/test_direct.py
 tests/test_folders.py
 tests/test_foundations.py
+tests/test_helpers.py
+tests/test_hidden_entries.py
 tests/test_installer.py
 tests/test_launch.py
 tests/test_library.py
@@ -89,10 +92,18 @@ tests/test_metadata_ui.py
 tests/test_portable.py
 tests/test_profiles.py
 tests/test_profiles_ui.py
+tests/test_ps4_packages.py
+tests/test_ps4_packages_ui.py
+tests/test_ps4_pkg.py
+tests/test_ps4_pkg_tool.py
+tests/test_ps4_pkg_ui.py
 tests/test_publication_audit.py
 tests/test_security_archives.py
+tests/test_shadps4.py
+tests/test_shadps4_start.py
 tests/test_storage_github.py
 tests/test_ui.py
+tests/test_winuae.py
 tests/test_winget.py
 tools/audit_publication.py
 tools/catalog_enrichment.json

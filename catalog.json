@@ -7,13 +7,15 @@
     "Microsoft Xbox",
     "Atari",
     "NEC",
-    "SNK/Arcade"
+    "SNK/Arcade",
+    "Commodore / Amiga"
   ],
   "official_sources": [
     "https://azahar-emu.org/",
     "https://cemu.info/",
     "https://dl.dolphin-emu.org/",
     "https://dolphin-emu.org/",
+    "https://download.abime.net/winuae/releases/",
     "https://github.com/LIJI32/SameBoy",
     "https://github.com/PCSX2/pcsx2",
     "https://github.com/Vita3K/Vita3K",
@@ -28,6 +30,9 @@
     "https://github.com/mgba-emu/mgba",
     "https://github.com/mupen64plus/mupen64plus-core",
     "https://github.com/nesdev-org/MesenCE",
+    "https://github.com/pearlxcore/PS4PKGTool",
+    "https://github.com/shadps4-emu/shadPS4",
+    "https://github.com/shadps4-emu/shadps4-qtlauncher",
     "https://github.com/snes9xgit/snes9x",
     "https://github.com/stella-emu/stella",
     "https://github.com/stenzek/duckstation",
@@ -38,6 +43,7 @@
     "https://pcsx2.net/",
     "https://rpcs3.net/",
     "https://sameboy.github.io/",
+    "https://shadps4.net/",
     "https://stella-emu.github.io/",
     "https://vita3k.org/",
     "https://www.duckstation.org/",
@@ -47,6 +53,7 @@
     "https://www.ppsspp.org/",
     "https://www.retroarch.com/",
     "https://www.retrodev.com/blastem/",
+    "https://www.winuae.net/",
     "https://www.yabasanshiro.com/",
     "https://xemu.app/",
     "https://xenia.jp/"
@@ -413,8 +420,8 @@
         "{game}"
       ],
       "controller_config": "auto",
-      "controller_manual": "Dolphin schließen. Zuvor in Controller → GameCube-Port 1 „Standard-Controller“ wählen, Konfigurieren öffnen und speichern. Danach die aktive GCPadNew.ini im Assistenten auswählen. Automatik gilt nur für GameCube-Port 1 mit XInput-Gamepad; Wii-Fernbedienung und Erweiterungen separat in Dolphin einstellen.",
       "controller_adapter": "dolphin_gc_xinput",
+      "controller_manual": "Dolphin schließen. Zuvor in Controller → GameCube-Port 1 „Standard-Controller“ wählen, Konfigurieren öffnen und speichern. Danach die aktive GCPadNew.ini im Assistenten auswählen. Automatik gilt nur für GameCube-Port 1 mit XInput-Gamepad; Wii-Fernbedienung und Erweiterungen separat in Dolphin einstellen.",
       "controller_note": "Automatik nur fuer GameCube-Port 1 mit XInput-Gamepad und vorhandener, ausdruecklich bestaetigter aktiver Konfigdatei. Wii wird manuell eingerichtet."
     },
     {
@@ -1552,6 +1559,174 @@
       "launch_note": "ZIP-Dateien müssen den vom Emulator erwarteten Set-Namen behalten. MAME erhält den eigenen Ordner als -rompath. In FinalBurn Neo den Ordner mit eigenen ZIP-Dateien zuerst in den Emulator-Einstellungen als Suchpfad einrichten; benötigt wird der passende vollständige eigene Set.",
       "controller_config": "manuell",
       "controller_manual": "FinalBurn Neo: Input → Map game inputs öffnen und Tasten für das laufende Spiel setzen. MAME: Tab → Eingabeeinstellungen öffnen und allgemeine oder spielbezogene Eingabe zuordnen. Standalone-Programme und Cores verwenden unterschiedliche Formate."
+    },
+    {
+      "id": "shadps4",
+      "kategorie": "Sony PlayStation",
+      "hersteller": "Sony",
+      "konsole": "PlayStation 4",
+      "emulator": "shadPS4",
+      "plattformen": "Windows/Linux (x64), macOS (Apple Silicon mit Rosetta 2; keine Intel-Macs)",
+      "pc_anforderung": "Sehr hoch",
+      "official_url": "https://github.com/shadps4-emu/shadPS4/releases",
+      "download_anleitung": "Veraltet: PS4 jetzt mit PS4 PKG Tool einrichten. Bestehende Installationen bleiben startbar; shadPS4 und QTLauncher werden im shadPS4 Manager des Tools verwaltet.",
+      "hinweis": "BIOS/Firmware und Spiele nur aus der eigenen Hardware oder direkt vom Rechteinhaber beziehen. Veraltet: PS4 jetzt mit PS4 PKG Tool einrichten. Bestehende Installationen bleiben startbar; shadPS4 und QTLauncher werden im shadPS4 Manager des Tools verwaltet. Frühes Entwicklungsstadium und beschränkte Spielekompatibilität. Nur eigene Spiele verwenden; PKG-Dateien sind nicht direkt startbar.",
+      "install_methode": "auto_github",
+      "download_muster": "^shadps4-win64-sdl-[0-9]+\\.[0-9]+\\.[0-9]+\\.zip$",
+      "exe": "shadPS4.exe",
+      "manuelle_schritte": [
+        "Für die neue PS4-Einrichtung die Karte PS4 PKG Tool und PS4 einrichten verwenden.",
+        "shadPS4 und QTLauncher im Tool unter Tools > shadPS4 Manager einrichten.",
+        "Vorhandene Hub-Installationen und persönliche Dateien bleiben erhalten und startbar.",
+        "Die vorhandene shadPS4.exe und gegebenenfalls der bereits eingerichtete QTLauncher bleiben dem alten Startprofil zugeordnet."
+      ],
+      "install_begruendung": "Der Eintrag bleibt ausschließlich für vorhandene Installationen erhalten. Der Hub installiert oder aktualisiert shadPS4 und QTLauncher nicht mehr; PS4 einrichten auf der PS4-PKG-Tool-Karte verwenden.",
+      "quelle_zeile": 24,
+      "quelle_beschreibung": "https://github.com/shadps4-emu/shadPS4/releases\nhttps://github.com/shadps4-emu/shadps4-qtlauncher/releases",
+      "quelle_emulator": "shadPS4",
+      "verified_at": "2026-10-03",
+      "hidden": true,
+      "github_repo": "shadps4-emu/shadPS4",
+      "archive_type": "zip",
+      "verified_release": "v.0.19.0",
+      "verified_asset": "shadps4-win64-sdl-0.19.0.zip",
+      "verified_asset_sha256": "b9600602a809b7cb4aaf29cbeb0917d32caecf27bc5a9232df76200fbf80c017",
+      "start_args": [
+        "-b"
+      ],
+      "start_note": "Starten öffnet den manuell bereitgestellten QTLauncher. Fehlt er, startet shadPS4.exe mit -b im Big-Picture-Modus. QTLauncher bietet aktuell nur Pre-Releases und wird nicht automatisch geladen; Einrichtung über Version Manager → Add Custom.",
+      "launcher": {
+        "install_methode": "manuell",
+        "official_url": "https://github.com/shadps4-emu/shadps4-qtlauncher/releases",
+        "github_repo": "shadps4-emu/shadps4-qtlauncher",
+        "download_muster": "^shadPS4QtLauncher-win64-qt-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9a-f]{7}\\.zip$",
+        "archive_type": "zip",
+        "directory": "qtlauncher",
+        "exe": "shadPS4QtLauncher.exe",
+        "args": [],
+        "note": "Aktuell ausschließlich Pre-Releases, kein stabiler /releases/latest: QTLauncher nur manuell bereitstellen. Das vollständige Windows-x64-ZIP nach qtlauncher entpacken. Im Launcher Version Manager → Add Custom öffnen, die eigene shadPS4.exe wählen und einen Versionsnamen eingeben. Der Launcher setzt diese lokale Version als Auswahl; ein automatisches Finden des Kerns wird nicht vorausgesetzt. Der Hub startet die Oberfläche ohne Spielparameter und ändert keine Launcher-Konfiguration.",
+        "verified_release": "shadPS4QtLauncher-2026-10-02-4c4e1090ea53dc1ec956fa9954acbf143d104b2e",
+        "verified_prerelease": true,
+        "verified_asset": "shadPS4QtLauncher-win64-qt-2026-10-02-4c4e109.zip",
+        "verified_asset_sha256": "7aaab50f623dfea987ed11e3fa6374c34f5fce988ab0673e4b0ab7216b7fab9f"
+      },
+      "deprecated": true,
+      "deprecated_note": "Veraltet: PS4 jetzt mit PS4 PKG Tool einrichten. Bestehende Installationen bleiben startbar; shadPS4 und QTLauncher werden im shadPS4 Manager des Tools verwaltet.",
+      "replacement_id": "ps4-pkg-tool",
+      "bios": [],
+      "backup_paths": [],
+      "bios_note": "shadPS4 benötigt je nach Spiel eigene Firmware-Module aus der eigenen Konsole im eigenen sys_modules-Ordner. Ein universeller BIOS-Dateiname würde keine vollständige Einrichtung bestätigen. Offizielle PS4-Firmware von Sony ist nicht direkt nutzbar. Die offiziellen shadPS4-Hinweise beachten und eigene tatsächlich benötigte Dateien gezielt zuordnen; der Hub lädt keine Firmware.",
+      "backup_note": "Gezielte Spielstand- und Einstellungspfade im eigenen shadPS4-Profil manuell zuordnen. Es wird kein unverifiziertes allgemeines Profil und kein Spiel-/Firmware-Ordner automatisch gesichert.",
+      "launch_args": [
+        "-g",
+        "{game}"
+      ],
+      "launch_extensions": [
+        ".bin"
+      ],
+      "launch_note": "Die Bibliothek startet den registrierten SDL-Kern direkt mit -g/--game und der eigenen entschlüsselten eboot.bin eines vollständigen PS4-Spielordners. Eine mehrdeutige .bin manuell PlayStation 4 zuordnen. „Starten“ auf der Emulator-Karte öffnet dagegen QTLauncher oder Big Picture mit -b; -b wird nicht mit -g kombiniert. Der restliche Spielordner und gegebenenfalls eigene Firmware-Module müssen vorhanden sein. PKG-Dateien sind kein direkt startbares Bibliotheksformat. Eigene .pkg werden nur als „Im PS4 PKG Tool installieren“ angezeigt. „Im PS4 PKG Tool installieren“ öffnet den externen Mini PKG Viewer; die Installation erfolgt manuell im Hauptfenster des Tools.",
+      "controller_config": "manuell",
+      "controller_manual": "Den eigenen Controller anschließen und die SDL-Eingabe sowie eine benötigte native Tastenbelegung anhand der offiziellen shadPS4-Dokumentation im eigenen Profil einrichten. Der SDL-Build hat keinen grafischen Controller-Assistenten. Die automatische Konfigurationsänderung durch den Hub ist für shadPS4 nicht verifiziert."
+    },
+    {
+      "id": "ps4-pkg-tool",
+      "kategorie": "Sony PlayStation",
+      "hersteller": "Sony",
+      "konsole": "PlayStation 4 (Hilfsprogramm)",
+      "emulator": "PS4 PKG Tool",
+      "plattformen": "Windows (x64; .NET 10 Windows Desktop Runtime)",
+      "pc_anforderung": "Niedrig",
+      "official_url": "https://github.com/pearlxcore/PS4PKGTool/releases",
+      "download_anleitung": "PS4 einrichten lädt das Tool erst nach ausdrücklicher Bestätigung aus einem stabilen offiziellen Release. Bei installiertem Tool öffnet der Button dessen Hauptfenster. 1) PS4 PKG Tool über PS4 einrichten starten. 2) Tools > shadPS4 Manager öffnen; shadPS4 über Install shadPS4 und QTLauncher installieren. 3) Im Manager den Spielebibliotheksordner festlegen. 4) Eigene PKG und passende Update-PKG laden; Install to shadPS4 wählen. 5) QTLauncher starten. Menünamen können sich in neuen Versionen ändern. Nur eigene Spiele verwenden.",
+      "hinweis": "BIOS/Firmware und Spiele nur aus der eigenen Hardware oder direkt vom Rechteinhaber beziehen. Hilfsprogramm, kein Emulator. Der shadPS4 Manager des Tools übernimmt die Einrichtung von shadPS4 und QTLauncher. Nur eigene Spiele-PKGs; im Hub als Im PS4 PKG Tool installieren erfasst und nicht startbar. Der Hub öffnet das Tool oder übergibt einen Pfad an den Viewer. Keine eigene Entschlüsselung, Paketinstallation oder Schlüssel/Key-Dateien. Unabhängiges GPL-3.0-Drittprogramm, nicht mitgeliefert. Menünamen können sich ändern.",
+      "install_methode": "auto_github",
+      "download_muster": "^PS4-PKG-Tool-v[0-9]+\\.[0-9]+\\.[0-9]+\\.zip$",
+      "exe": "PS4 PKG Tool.exe",
+      "manuelle_schritte": [
+        "Die offizielle Quelle https://github.com/pearlxcore/PS4PKGTool/releases öffnen und ausschließlich einen stabilen Release wählen. Geprüft: v1.8.0, PS4-PKG-Tool-v1.8.0.zip. Quelle und SHA-256 prüfen.",
+        "Das vollständige Tool-ZIP in einen eigenen beschreibbaren Ordner entpacken und mit Ordner auswählen zuordnen. Startdatei: PS4 PKG Tool.exe. .NET 10 Windows Desktop Runtime bei Bedarf separat einrichten; Antivirus kann bei unsignierten Programmen warnen.",
+        "PS4 PKG Tool über PS4 einrichten starten.",
+        "Tools > shadPS4 Manager öffnen; shadPS4 über Install shadPS4 und QTLauncher installieren.",
+        "Im Manager den Spielebibliotheksordner festlegen.",
+        "Eigene PKG und passende Update-PKG laden; Install to shadPS4 wählen.",
+        "QTLauncher starten.",
+        "Menünamen können sich in neuen Versionen ändern. Nur eigene Spiele-PKGs verwenden. Ein PKG-Pfad öffnet den Viewer; PS4 einrichten öffnet das Hauptfenster für die Einrichtung und Installation."
+      ],
+      "install_begruendung": "Die offizielle GitHub-API liefert einen stabilen Release ohne Draft-/Pre-Release-Markierung mit genau einem passenden ZIP und SHA-256. Der Release-Quelltext belegt den Windows-x64-Build und PS4 PKG Tool.exe. Download ausschließlich nach ausdrücklicher Bestätigung; keine Einbettung in Hub-Pakete.",
+      "quelle_zeile": 25,
+      "quelle_beschreibung": "https://github.com/pearlxcore/PS4PKGTool/releases",
+      "quelle_emulator": "PS4 PKG Tool",
+      "verified_at": "2026-10-03",
+      "hidden": true,
+      "github_repo": "pearlxcore/PS4PKGTool",
+      "archive_type": "zip",
+      "verified_release": "v1.8.0",
+      "verified_asset": "PS4-PKG-Tool-v1.8.0.zip",
+      "verified_asset_sha256": "1ef9bb1f4ec1ad4e10f5a7d814e216323019385977c5b4409c911c5943884ea1",
+      "entry_type": "utility",
+      "package_args": [
+        "{package}"
+      ],
+      "download_notice": "PS4 PKG Tool ist ein unabhängiges Drittprogramm von pearlxcore und nicht Teil des Hub-Projekts. Offizielle Quelle: https://github.com/pearlxcore/PS4PKGTool/releases. Geprüftes Asset: PS4-PKG-Tool-v1.8.0.zip; SHA-256: 1ef9bb1f4ec1ad4e10f5a7d814e216323019385977c5b4409c911c5943884ea1. Der aktuelle Download wird gegen die Prüfsumme der offiziellen GitHub-API geprüft. Das Tool wird nur nach deinem ausdrücklichen Klick heruntergeladen und nicht mitgeliefert. Antivirus oder SmartScreen können bei unsignierten Programmen warnen. GPL-3.0; .NET 10 Windows Desktop Runtime muss gegebenenfalls separat vorhanden sein.",
+      "license": "GPL-3.0",
+      "ps4_setup_steps": [
+        "PS4 PKG Tool über PS4 einrichten starten.",
+        "Tools > shadPS4 Manager öffnen; shadPS4 über Install shadPS4 und QTLauncher installieren.",
+        "Im Manager den Spielebibliotheksordner festlegen.",
+        "Eigene PKG und passende Update-PKG laden; Install to shadPS4 wählen.",
+        "QTLauncher starten."
+      ]
+    },
+    {
+      "id": "winuae",
+      "kategorie": "Commodore / Amiga",
+      "hersteller": "Commodore / Amiga",
+      "konsole": "Amiga (A500, A1200, CD32 …)",
+      "emulator": "WinUAE",
+      "plattformen": "Windows",
+      "pc_anforderung": "Niedrig",
+      "official_url": "https://www.winuae.net/download/",
+      "download_anleitung": "1. Die offizielle Downloadseite https://www.winuae.net/download/ öffnen und die aktuelle stabile Version im Abschnitt WinUAE prüfen. Beta-, Erweiterungs- und alte Downloads überspringen. 2. Im aktuellen Versionsabschnitt Download (64-bit) als ZIP wählen, nicht den MSI-Installer und nicht das 32-Bit-ZIP. Geprüft: WinUAE6030_x64.zip für 6.0.3, offiziell verlinkt unter https://download.abime.net/winuae/releases/. 3. Das vollständige ZIP in einen eigenen beschreibbaren Ordner entpacken. Geprüfte Startdatei: winuae64.exe. Den Ordner bei Bedarf über Ordner auswählen im Hub registrieren. 4. Ein eigenes lizenziertes oder selbst gesichertes Kickstart-ROM bereitstellen. In WinUAE unter Paths den ROMs-Ordner wählen und das zum Amiga-Modell passende Kickstart in der ROM-Auswahl einstellen. 5. Hardwaremodell und eigene Disk-/Festplatten-/CD-Abbilder in WinUAE passend konfigurieren; die Konfiguration als eigene .uae-Datei speichern. Images sind über WinUAE-Konfiguration zu starten; der Hub kann nur diese vorbereitete .uae-Konfiguration direkt laden. 6. Updates werden für automatische Installationen über die aktuelle stabile Version der offiziellen Downloadseite geprüft. Falls die Seite nicht eindeutig erkannt wird oder der Ordner manuell zugeordnet ist, die Version auf dieser Seite manuell prüfen.",
+      "hinweis": "BIOS/Firmware und Spiele nur aus der eigenen Hardware oder direkt vom Rechteinhaber beziehen. WinUAE enthält kein Kickstart-ROM. Du brauchst ein lizenziertes bzw. aus eigener Amiga-Hardware selbst gesichertes Kickstart (z. B. gekauft mit Amiga Forever). Der Hub lädt, verlinkt oder bündelt keine Kickstart-ROMs, Spiele (ADF-Abbilder usw.) oder Workbench-Dateien. Eigene Images sind über WinUAE-Konfiguration zu starten; Hardwaremodell und benötigte eigene ROM-Dateien vorher in WinUAE einrichten.",
+      "install_methode": "auto_direct",
+      "download_muster": "^WinUAE[0-9]+_x64\\.zip$",
+      "exe": "winuae64.exe",
+      "manuelle_schritte": [
+        "Die offizielle Downloadseite https://www.winuae.net/download/ öffnen und die aktuelle stabile Version im Abschnitt WinUAE prüfen. Beta-, Erweiterungs- und alte Downloads überspringen.",
+        "Im aktuellen Versionsabschnitt Download (64-bit) als ZIP wählen, nicht den MSI-Installer und nicht das 32-Bit-ZIP. Geprüft: WinUAE6030_x64.zip für 6.0.3, offiziell verlinkt unter https://download.abime.net/winuae/releases/.",
+        "Das vollständige ZIP in einen eigenen beschreibbaren Ordner entpacken. Geprüfte Startdatei: winuae64.exe. Den Ordner bei Bedarf über Ordner auswählen im Hub registrieren.",
+        "Ein eigenes lizenziertes oder selbst gesichertes Kickstart-ROM bereitstellen. In WinUAE unter Paths den ROMs-Ordner wählen und das zum Amiga-Modell passende Kickstart in der ROM-Auswahl einstellen.",
+        "Hardwaremodell und eigene Disk-/Festplatten-/CD-Abbilder in WinUAE passend konfigurieren; die Konfiguration als eigene .uae-Datei speichern. Images sind über WinUAE-Konfiguration zu starten; der Hub kann nur diese vorbereitete .uae-Konfiguration direkt laden.",
+        "Updates werden für automatische Installationen über die aktuelle stabile Version der offiziellen Downloadseite geprüft. Falls die Seite nicht eindeutig erkannt wird oder der Ordner manuell zugeordnet ist, die Version auf dieser Seite manuell prüfen."
+      ],
+      "install_begruendung": "Die offizielle Downloadseite nennt die aktuelle stabile Version und verlinkt genau ein dazu passendes Windows-x64-ZIP. Der Resolver prüft Versionsüberschrift und tatsächlichen Dateinamen gemeinsam; nur offiziell verlinkte HTTPS-Dateien unter download.abime.net/winuae/releases/ sind erlaubt. Das reale Archiv enthält winuae64.exe (AMD64). Keine dedizierte Versions-API oder offizielle Prüfsumme vorhanden; bei fehlendem oder uneindeutigem Treffer manuell einrichten.",
+      "quelle_zeile": 26,
+      "quelle_beschreibung": "WinUAE – offizielle Downloadseite",
+      "quelle_emulator": "WinUAE",
+      "verified_at": "2026-10-03",
+      "archive_type": "zip",
+      "direct_url": "https://www.winuae.net/download/",
+      "direct_resolver": "winuae",
+      "verified_release": "6.0.3",
+      "verified_asset": "WinUAE6030_x64.zip",
+      "verified_asset_sha256": null,
+      "start_note": "WinUAE enthält kein Kickstart-ROM. Eigenes lizenziertes oder selbst gesichertes Kickstart erforderlich. Der Hub lädt, verlinkt oder bündelt keine Kickstart-ROMs, Spiele oder Workbench-Dateien.",
+      "bios": [],
+      "backup_paths": [],
+      "bios_note": "Kickstart ist erforderlich, wird aber nicht mitgeliefert. Nur eine eigene lizenzierte oder selbst gesicherte ROM-Datei verwenden. In WinUAE unter Paths den ROMs-Ordner und in der ROM-Auswahl das passende Kickstart einstellen; eine .uae-Konfiguration kann kickstart_rom_file verwenden. Dateiname und Pfad hängen von Modell und Konfiguration ab, daher kein erfundener fester BIOS-Prüfpfad. Eigene verwendete Dateien im Hub bei Bedarf manuell zuordnen.",
+      "backup_note": "Keine universellen Save- oder Konfigurationspfade vorgegeben. Gezielte eigene Save-/State-/Einstellungspfade manuell zuordnen; keine gesamten Spieleordner sichern.",
+      "launch_args": [
+        "-f",
+        "{game}",
+        "-s",
+        "use_gui=no"
+      ],
+      "launch_extensions": [
+        ".uae"
+      ],
+      "launch_note": "Eigene Amiga-Images sind über WinUAE-Konfiguration zu starten. In WinUAE das passende Hardwaremodell, dein eigenes Kickstart und die eigenen Disk-/Festplatten-/CD-Abbilder einrichten und eine .uae-Konfiguration speichern. Nur diese vorbereitete .uae-Datei kann der Hub direkt mit -f und -s use_gui=no starten.",
+      "controller_config": "manuell",
+      "controller_manual": "Die Controllerbelegung in WinUAE selbst einrichten und in der eigenen .uae-Konfiguration speichern; der Hub setzt keine automatische Belegung."
     }
   ]
 }

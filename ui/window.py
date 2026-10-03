@@ -33,7 +33,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from core.catalog import LEGAL_NOTICE
+from core.catalog import CatalogError, LEGAL_NOTICE, visible_items
+from core.library import is_ps4_package, game_status, WINUAE_CONFIG_STATUS
 from core.version import VERSION
 
 from .branding import HubLogo
@@ -79,7 +80,12 @@ class EmulatorCard(QFrame):
         names.setSpacing(1)
         self.name_label = label(entry["emulator"], "cardTitle")
         names.addWidget(self.name_label)
-        console = label(entry.get("konsole", ""), "console")
+        utility = entry.get("entry_type") == "utility"
+        self.ps4_setup = entry["id"] == "ps4-pkg-tool"
+        console_text = "Hilfsprogramm · PlayStation 4" if utility else entry.get("konsole", "")
+        if entry.get("deprecated"):
+            console_text += " · Veraltet (Altinstallation)"
+        console = label(console_text, "console")
         names.addWidget(console)
         heading.addLayout(names, 1)
         self.favorite_button = QPushButton("☆")
@@ -112,11 +118,24 @@ class EmulatorCard(QFrame):
 
         method = entry.get("install_methode", "manuell")
         method_text = "Manuelle Einrichtung mit Anleitung" if method == "manuell" else "Automatische Installation aus offizieller Quelle"
+        if utility:
+            method_text = "Drittprogramm · Installation nur nach ausdrücklichem Klick"
+        if entry.get("deprecated"):
+            method_text = entry["deprecated_note"]
         if method != "manuell" and entry.get("auto_emulator"):
             method_text = f"Automatische Installation: {entry['auto_emulator']}"
         self.method_label = label(method_text, "cardNote")
         self.method_label.setToolTip("\n\n".join(str(entry.get(key, "")) for key in ("install_begruendung", "hinweis") if entry.get(key)))
         layout.addWidget(self.method_label)
+        if entry.get("start_note") and not entry.get("deprecated"):
+            self.start_note_label = label(entry["start_note"], "cardNote")
+            layout.addWidget(self.start_note_label)
+        if self.ps4_setup:
+            self.setup_steps_label = label("\n".join(
+                f"{number}) {step}" for number, step in enumerate(entry.get("ps4_setup_steps", []), 1)
+            ), "cardNote")
+            layout.addWidget(self.setup_steps_label)
+            layout.addWidget(label("Menünamen können sich in neuen Versionen ändern. Nur eigene Spiele-PKGs verwenden.", "cardNote"))
         layout.addStretch(1)
 
         actions = QHBoxLayout()
@@ -124,7 +143,11 @@ class EmulatorCard(QFrame):
         self.install_button = QPushButton("Installieren")
         self.install_button.setObjectName("primary")
         self.install_button.clicked.connect(lambda: self.installRequested.emit(entry))
-        self.start_button = QPushButton("Starten")
+        self.start_button = QPushButton("PS4 einrichten" if self.ps4_setup else "Starten")
+        if self.ps4_setup:
+            self.start_button.setObjectName("primary")
+        if entry.get("start_note") and not entry.get("deprecated"):
+            self.start_button.setToolTip(entry["start_note"])
         self.start_button.clicked.connect(lambda: self.startRequested.emit(entry))
         self.uninstall_button = QPushButton("Deinstallieren")
         self.uninstall_button.setToolTip("Installation oder Registrierung entfernen")
@@ -133,7 +156,13 @@ class EmulatorCard(QFrame):
             button.setProperty("cardAction", True)
         self.emulator_folder_button = self._folder_button("folder", "Emulator-Ordner öffnen")
         self.emulator_folder_button.clicked.connect(lambda: self.emulatorFolderRequested.emit(entry))
-        self.games_folder_button = self._folder_button("gamepad", "Spiele-Ordner öffnen")
+        if self.ps4_setup:
+            self.games_folder_button = QPushButton("Ordner für Spiele-PKGs öffnen")
+            self.games_folder_button.setObjectName("quiet")
+            self.games_folder_button.setToolTip("Ordner mit deinen eigenen Spiele-PKGs öffnen; Rechtsklick zum Ändern")
+            self.games_folder_button.setAccessibleName("Ordner für Spiele-PKGs öffnen")
+        else:
+            self.games_folder_button = self._folder_button("gamepad", "Spiele-Ordner öffnen")
         self.games_folder_button.clicked.connect(lambda: self.gamesFolderRequested.emit(entry))
         self.games_folder_button.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.games_folder_button.customContextMenuRequested.connect(
@@ -143,8 +172,12 @@ class EmulatorCard(QFrame):
         actions.addWidget(self.start_button)
         actions.addWidget(self.uninstall_button)
         actions.addWidget(self.emulator_folder_button)
-        actions.addWidget(self.games_folder_button)
+        if not self.ps4_setup:
+            actions.addWidget(self.games_folder_button)
         layout.addLayout(actions)
+        if self.ps4_setup:
+            layout.addWidget(self.games_folder_button, 0, Qt.AlignmentFlag.AlignLeft)
+            self.install_button.hide()
         links = QHBoxLayout()
         links.setSpacing(14)
         official = QPushButton("Offizielle Seite ↗")
@@ -161,6 +194,16 @@ class EmulatorCard(QFrame):
         self.profiles_button.setObjectName("quiet")
         self.profiles_button.clicked.connect(lambda: self.profilesRequested.emit(entry))
         layout.addWidget(self.profiles_button, 0, Qt.AlignmentFlag.AlignLeft)
+        if utility:
+            if not self.ps4_setup:
+                self.games_folder_button.hide()
+            self.profiles_button.hide()
+            self.emulator_folder_button.setAccessibleName("Hilfsprogramm-Ordner öffnen")
+        if entry.get("deprecated"):
+            self.install_button.hide()
+            self.manual_button.hide()
+            self.profiles_button.hide()
+            official.hide()
         legal = label(LEGAL_NOTICE, "legal")
         layout.addWidget(legal)
         self.setMinimumHeight(270)
@@ -186,16 +229,17 @@ class EmulatorCard(QFrame):
         installed = service.is_installed(identifier)
         recorded = identifier in service.installed
         status = service.status(identifier)
-        update = "update" in status.casefold()
+        update = "update" in status.casefold() and not self.entry.get("deprecated")
         self.status_label.setText(status[:1].upper() + status[1:])
         color, background = ("#f3cb87", "#443b2e") if update else (("#82dab2", "#233e36") if installed else ("#97a9c0", "#263347"))
         self.status_label.setStyleSheet(f"color: {color}; background: {background};")
         self.install_button.setText("Aktualisieren" if update else ("Installiert" if installed else "Installieren"))
-        self.install_button.setEnabled(not busy and (not installed or update))
-        self.start_button.setEnabled(installed and not busy)
+        self.install_button.setEnabled(not busy and (not installed or update) and not self.entry.get("deprecated"))
+        self.start_button.setEnabled((installed or self.ps4_setup) and not busy)
         self.uninstall_button.setEnabled(recorded and not busy)
         self.emulator_folder_button.setEnabled(installed and hasattr(service, "open_emulator_folder"))
-        self.emulator_folder_button.setToolTip("Emulator-Ordner öffnen" if installed else "Noch nicht installiert")
+        folder_label = "Hilfsprogramm-Ordner öffnen" if self.entry.get("entry_type") == "utility" else "Emulator-Ordner öffnen"
+        self.emulator_folder_button.setToolTip(folder_label if installed else "Noch nicht installiert")
         self.games_folder_button.setEnabled(hasattr(service, "open_games_folder"))
         record = service.installed.get(identifier, {})
         version = record.get("version")
@@ -210,7 +254,9 @@ class EmulatorCard(QFrame):
         self.favorite_button.setEnabled(settings is not None and not busy)
         self.profiles_button.setEnabled(recorded and not busy and hasattr(service, "profile_paths"))
         self.profiles_button.setToolTip("Eigene BIOS-Dateien prüfen sowie Spielstände und Einstellungen sichern" if recorded else "Installiere den Emulator zuerst oder ordne seinen Ordner zu")
-        if hasattr(service, "compatibility"):
+        if self.entry.get("entry_type") == "utility":
+            self.compatibility_label.setText("PS4-Paketverwaltung · kein Emulator · .NET 10 Desktop erforderlich")
+        elif hasattr(service, "compatibility"):
             result = service.compatibility(self.entry)
             status = result.get("status", "Unbekannt")
             reason = result.get("reason", "")
@@ -287,7 +333,9 @@ class MainWindow(QMainWindow):
         self.navigation.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.navigation.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self._category_rows: list[tuple[str, QLabel]] = []
-        categories = [("home", "Startseite"), ("all", "Alle Emulatoren"), ("installed", "Installiert")]
+        self._category_labels = {}
+        all_label = "Emulatoren & Hilfe" if any(entry.get("entry_type") == "utility" for entry in self.catalog.items) else "Alle Emulatoren"
+        categories = [("home", "Startseite"), ("all", all_label), ("installed", "Installiert")]
         if hasattr(self.service, "library"):
             categories.extend([("library", "Bibliothek"), ("settings", "Einstellungen")])
         categories.extend((name, name) for name in self.catalog.categories)
@@ -299,6 +347,7 @@ class MainWindow(QMainWindow):
             row_layout = QHBoxLayout(row)
             row_layout.setContentsMargins(10, 0, 11, 0)
             category_label = label(text, wrap=False)
+            self._category_labels[key] = category_label
             category_label.setStyleSheet("font-size: 9pt;" if len(text) > 15 else "")
             row_layout.addWidget(category_label, 1)
             count = label("0", wrap=False)
@@ -449,6 +498,7 @@ class MainWindow(QMainWindow):
         if hasattr(self.service, "library"):
             self.library_page = LibraryPage(self.service)
             self.library_page.launchRequested.connect(self.launch_game)
+            self.library_page.packageInstallRequested.connect(self.install_ps4_package)
             self.library_page.assignmentRequested.connect(self.assign_game_console)
             self.library_page.favoriteRequested.connect(self.toggle_game_favorite)
             self.library_page.settingsRequested.connect(lambda: self.select_page("settings"))
@@ -459,6 +509,7 @@ class MainWindow(QMainWindow):
             self.settings_page = SettingsPage(self.service)
             self.settings_page.foldersChanged.connect(self.save_game_folders)
             self.settings_page.scanRequested.connect(self.scan_library)
+            self.settings_page.showHiddenChanged.connect(self.save_show_hidden)
             self.settings_page.cover_panel.saveRequested.connect(self.save_metadata_credentials)
             self.settings_page.cover_panel.loadRequested.connect(self.load_metadata_credentials)
             self.settings_page.cover_panel.clearRequested.connect(self.clear_metadata_cache)
@@ -494,7 +545,7 @@ class MainWindow(QMainWindow):
 
     def _connect_card(self, card) -> None:
         card.installRequested.connect(self.install)
-        card.startRequested.connect(self.start_emulator)
+        card.startRequested.connect(self.setup_ps4 if card.ps4_setup else self.start_emulator)
         card.uninstallRequested.connect(self.uninstall)
         card.officialRequested.connect(self.open_official)
         card.manualRequested.connect(self.show_manual)
@@ -543,6 +594,29 @@ class MainWindow(QMainWindow):
         current = self.navigation.currentItem()
         return current.data(Qt.ItemDataRole.UserRole) if current else "home"
 
+    def _visible_catalog_entries(self):
+        settings = getattr(self.service, "settings", None)
+        show_hidden = settings.get("show_hidden", False) if settings is not None else False
+        return visible_items(self.catalog, show_hidden)
+
+    def _available_entries(self):
+        return [entry for entry in self._visible_catalog_entries()
+                if not entry.get("deprecated") or entry["id"] in self.service.installed or entry.get("hidden")]
+
+    def save_show_hidden(self, enabled):
+        try:
+            self.service.settings.set("show_hidden", enabled)
+        except Exception as exc:
+            checkbox = self.settings_page.show_hidden
+            checkbox.blockSignals(True)
+            checkbox.setChecked(self.service.settings.get("show_hidden", False))
+            checkbox.blockSignals(False)
+            self._message("Sichtbarkeit konnte nicht gespeichert werden", str(exc), error=True)
+            return
+        self.refresh()
+        if self._couch_dialog is not None:
+            self._couch_dialog._show_consoles()
+
     def _filter_cards(self) -> None:
         category = self._category()
         library = category == "library" and hasattr(self, "library_page")
@@ -560,13 +634,17 @@ class MainWindow(QMainWindow):
         favorites = list(settings.favorites) if settings is not None else []
         recent = [item["id"] for item in settings.recent_emulators] if settings is not None else []
         self.visible_entries = [
-            entry for entry in self.catalog.items
+            entry for entry in self._available_entries()
             if (category == "all" or (category == "home" and entry["id"] in favorites + recent) or (category == "installed" and self.service.is_installed(entry["id"])) or entry.get("kategorie") == category)
             and (not query or query in " ".join(str(entry.get(key, "")) for key in ("emulator", "konsole", "kategorie")).casefold())
         ]
-        self.category_title.setText({"home": "Deine Startseite", "all": "Alle Emulatoren", "installed": "Installierte Emulatoren"}.get(category, category))
         count = len(self.visible_entries)
-        self.results_label.setText(f"{count} {'Emulator' if count == 1 else 'Emulatoren'}" + (f" · Suche: {self.search.text().strip()}" if query else " · Offizielle Projekte"))
+        utilities = sum(entry.get("entry_type") == "utility" for entry in self.visible_entries)
+        all_title = "Emulatoren & Hilfsprogramme" if any(entry.get("entry_type") == "utility" for entry in self._available_entries()) else "Alle Emulatoren"
+        installed_title = "Installierte Programme" if utilities else "Installierte Emulatoren"
+        self.category_title.setText({"home": "Deine Startseite", "all": all_title, "installed": installed_title}.get(category, category))
+        count_text = f"{count - utilities} Emulatoren · {utilities} Hilfsprogramm" if utilities else f"{count} {'Emulator' if count == 1 else 'Emulatoren'}"
+        self.results_label.setText(count_text + (f" · Suche: {self.search.text().strip()}" if query else " · Offizielle Projekte"))
         self._arrange_cards()
 
     def _arrange_cards(self) -> None:
@@ -626,9 +704,10 @@ class MainWindow(QMainWindow):
             self._arrange_cards()
 
     def refresh(self) -> None:
-        installed_count = sum(self.service.is_installed(entry["id"]) for entry in self.catalog.items)
-        update_count = sum("update" in self.service.status(entry["id"]).casefold() for entry in self.catalog.items)
-        self.total_value.setText(str(len(self.catalog.items)))
+        entries = self._available_entries()
+        installed_count = sum(self.service.is_installed(entry["id"]) for entry in entries)
+        update_count = sum("update" in self.service.status(entry["id"]).casefold() for entry in entries if not entry.get("deprecated"))
+        self.total_value.setText(str(sum(entry.get("entry_type", "emulator") == "emulator" for entry in entries)))
         self.installed_value.setText(str(installed_count))
         self.updates_value.setText(str(update_count))
         self.updates_value.setStyleSheet("color: #f3cb87;" if update_count else "color: #91a3bb;")
@@ -640,15 +719,32 @@ class MainWindow(QMainWindow):
         self.couch_button.setEnabled(not busy and hasattr(self.service, "library"))
         self._update_system_summary(getattr(self.service, "system_report", None))
         settings = getattr(self.service, "settings", None)
+        populated = {entry["kategorie"] for entry in entries}
+        for row in range(self.navigation.count()):
+            item = self.navigation.item(row)
+            key = item.data(Qt.ItemDataRole.UserRole)
+            item.setHidden(key in self.catalog.categories and key not in populated)
+        current = self.navigation.currentItem()
+        if current is not None and current.isHidden():
+            self.select_page("all")
+        self._category_labels["all"].setText("Emulatoren & Hilfe" if any(entry.get("entry_type") == "utility" for entry in entries) else "Alle Emulatoren")
         for key, count in self._category_rows:
-            number = len(set(settings.favorites + [item["id"] for item in settings.recent_emulators])) if key == "home" and settings is not None else len(self.catalog.items) if key == "all" else installed_count if key == "installed" else sum(entry.get("kategorie") == key for entry in self.catalog.items)
-            count.setText(str(len(self.service.library.games)) if key == "library" else "" if key == "settings" else str(number))
+            number = sum(entry["id"] in set(settings.favorites + [item["id"] for item in settings.recent_emulators]) for entry in entries) if key == "home" and settings is not None else len(entries) if key == "all" else installed_count if key == "installed" else sum(entry.get("kategorie") == key for entry in entries)
+            count.setText(str(len(self.service.library.visible_games)) if key == "library" else "" if key == "settings" else str(number))
+        available_ids = {entry["id"] for entry in entries}
         for card in list(self.cards.values()) + list(self.recent_cards.values()):
-            card.refresh(self.service, busy)
+            if card.entry["id"] in available_ids:
+                card.refresh(self.service, busy)
+            else:
+                card.hide()
         if hasattr(self, "library_page"):
             self.library_page.set_busy(busy)
             self.library_page.refresh_games()
             self.settings_page.set_busy(busy)
+            checkbox = self.settings_page.show_hidden
+            checkbox.blockSignals(True)
+            checkbox.setChecked(self.service.settings.get("show_hidden", False))
+            checkbox.blockSignals(False)
         if self._profile_dialog is not None:
             self._profile_dialog.set_busy(busy)
         self._filter_cards()
@@ -663,6 +759,7 @@ class MainWindow(QMainWindow):
         if self._couch_dialog is None:
             self._couch_dialog = CouchDialog(self.service, self)
             self._couch_dialog.launchRequested.connect(self.launch_game)
+            self._couch_dialog.packageInstallRequested.connect(self.install_ps4_package)
             self._couch_dialog.finished.connect(self._couch_closed)
         self._couch_dialog.showFullScreen()
         self._couch_dialog.raise_()
@@ -801,7 +898,16 @@ class MainWindow(QMainWindow):
 
     def scan_library(self):
         roots = self.settings_page.roots()
-        if not roots:
+        from core.folders import games_directories
+        mapped_folders = games_directories(self.service.settings)
+        ps4_mapping = any(
+            entry["id"] in mapped_folders and (entry["id"] == "ps4-pkg-tool" or (
+                entry.get("entry_type") != "utility" and
+                (entry["konsole"] == "PlayStation 4" or "PlayStation 4" in entry.get("supported_consoles", []))
+            ))
+            for entry in self._visible_catalog_entries()
+        )
+        if not roots and not ps4_mapping:
             self._notify("Füge zuerst einen Ordner mit deinen eigenen Spiel-Dateien in den Einstellungen hinzu.")
             self.select_page("settings")
             return
@@ -822,7 +928,7 @@ class MainWindow(QMainWindow):
         self._run_job("Bibliothek · Eigene Spiel-Dateien werden gesucht …", lambda progress, log, event: self.service.library.scan(roots, progress, log, event), complete)
 
     def _game(self, identifier):
-        return next((game for game in self.service.library.games if game["id"] == identifier), None)
+        return next((game for game in self.service.library.visible_games if game["id"] == identifier), None)
 
     def save_metadata_credentials(self, provider, values, test=False):
         if self.worker is not None:
@@ -867,7 +973,7 @@ class MainWindow(QMainWindow):
     def load_game_metadata(self, identifier=None):
         if self.worker is not None or not hasattr(self.service, "metadata"):
             return
-        games = [self._game(identifier)] if identifier else self.service.library.games
+        games = [self._game(identifier)] if identifier else self.service.library.visible_games
         games = [game for game in games if game is not None and not game.get("missing")]
         if identifier and games and not games[0].get("console"):
             if not self.assign_game_console(identifier):
@@ -954,7 +1060,7 @@ class MainWindow(QMainWindow):
         if game is None:
             return False
         candidates = game.get("candidates", [])
-        consoles = list(dict.fromkeys(candidates + self.service.library.supported_consoles))
+        consoles = list(dict.fromkeys(candidates + self.service.library.visible_supported_consoles))
         current = consoles.index(game["console"]) if game.get("console") in consoles else 0
         chosen, accepted = QInputDialog.getItem(self, "Konsole zuordnen", f"Zu welcher Konsole gehört {game['name']}?\nDatei: {game['path']}", consoles, current, False)
         if not accepted or not chosen:
@@ -982,6 +1088,9 @@ class MainWindow(QMainWindow):
         game = self._game(identifier)
         if game is None:
             return
+        if is_ps4_package(game):
+            self.install_ps4_package(identifier)
+            return
         if game.get("missing"):
             self._notify("Die eigene Spiel-Datei fehlt. Prüfe den gespeicherten Dateipfad und scanne den Spieleordner erneut.", error=True)
             return
@@ -989,12 +1098,20 @@ class MainWindow(QMainWindow):
             if not self.assign_game_console(identifier):
                 return
             game = self._game(identifier)
+        if game_status(game) == WINUAE_CONFIG_STATUS:
+            self._notify(f"{WINUAE_CONFIG_STATUS}. Lege das eigene Image in einer passenden WinUAE-Konfiguration ein, speichere sie als .uae und starte diese aus der Bibliothek.")
+            return
         from core.launch import compatible_entries
-        entries = compatible_entries(self.catalog, game["console"])
+        available_ids = {entry["id"] for entry in self._visible_catalog_entries()}
+        entries = [entry for entry in compatible_entries(self.catalog, game["console"]) if entry["id"] in available_ids]
         if not entries:
             self._notify("Für diese Konsole ist kein passender Emulator im Katalog hinterlegt. Wähle eine andere Zuordnung oder ergänze den Katalog.", error=True)
             return
         installed = [entry for entry in entries if self.service.is_installed(entry["id"])]
+        if not installed and all(entry.get("deprecated") for entry in entries):
+            self.select_page(entries[0]["kategorie"])
+            self._notify(entries[0]["deprecated_note"])
+            return
         choices = installed or entries
         chosen = next((entry for entry in choices if entry["id"] == game.get("emulator_id")), choices[0])
         if len(choices) > 1:
@@ -1032,6 +1149,42 @@ class MainWindow(QMainWindow):
                 self._append_log(warning)
                 self._notify(warning, error=True)
             self.refresh()
+
+    def install_ps4_package(self, identifier):
+        if self.worker is not None:
+            self._notify("Bitte warte, bis der laufende Vorgang abgeschlossen ist.")
+            return
+        game = self._game(identifier)
+        if game is None or not is_ps4_package(game):
+            return
+        if game.get("missing"):
+            self._notify("Die eigene PKG-Datei fehlt. Prüfe den gespeicherten Pfad und scanne erneut.", error=True)
+            return
+        try:
+            entry = self.catalog.by_id("ps4-pkg-tool")
+        except CatalogError:
+            self._notify("PS4 PKG Tool fehlt im Katalog. Prüfe die Katalogdatei.", error=True)
+            return
+        if not self.service.is_installed(entry["id"]):
+            box = QMessageBox(self)
+            box.setWindowTitle("PS4 PKG Tool installieren")
+            box.setTextFormat(Qt.TextFormat.PlainText)
+            box.setText("PS4 PKG Tool ist noch nicht installiert.")
+            box.setInformativeText("Das Drittprogramm öffnet den PKG Viewer mit deiner eigenen Datei. Installiere das Tool und wähle das Paket anschließend erneut. Vor dem Download werden Quelle und Prüfsumme angezeigt.")
+            install = box.addButton("PS4 PKG Tool installieren", QMessageBox.ButtonRole.AcceptRole)
+            cancel = box.addButton("Abbrechen", QMessageBox.ButtonRole.RejectRole)
+            box.setDefaultButton(cancel)
+            box.exec()
+            if box.clickedButton() == install:
+                self.install(entry)
+            return
+        try:
+            from core.launch import launch_ps4_pkg_tool
+            launch_ps4_pkg_tool(self.service, entry, game["path"])
+        except Exception as exc:
+            self._message("PS4 PKG Tool konnte nicht geöffnet werden", str(exc), error=True)
+        else:
+            self._notify("Im PS4 PKG Tool installieren. Der PKG Viewer wurde geöffnet; für die Installation das Hauptfenster über PS4 einrichten öffnen.")
 
     def _load_log(self) -> None:
         try:
@@ -1167,8 +1320,32 @@ class MainWindow(QMainWindow):
 
     @Slot(object)
     def install(self, entry: dict) -> None:
+        if entry.get("deprecated"):
+            self._notify(entry["deprecated_note"])
+            return
         if entry.get("install_methode", "manuell") == "manuell":
             self.show_manual(entry)
+            return
+        if entry.get("entry_type") == "utility":
+            def prepare(progress, log, event):
+                from core.errors import Cancelled
+                if event.is_set():
+                    raise Cancelled()
+                preview = self.service.prepare_install(entry)
+                if event.is_set():
+                    raise Cancelled()
+                return preview
+
+            def prepared(preview):
+                if self.worker is not None and not self.worker.cancel_event.is_set():
+                    self._after_job = lambda: self._confirm_utility_install(entry, preview)
+
+            self._run_job(
+                f"{entry['emulator']} · Stabiles Release und Downloadquelle prüfen …",
+                prepare,
+                prepared,
+                entry=entry,
+            )
             return
         dialog = ShortcutDialog(entry, self)
         if dialog.exec() != QDialog.DialogCode.Accepted:
@@ -1178,6 +1355,20 @@ class MainWindow(QMainWindow):
             f"{entry['emulator']} · Installation wird vorbereitet …",
             lambda progress, log, event: self.service.install(entry, progress, log, event, shortcuts=shortcuts),
             lambda _: self._notify(f"{entry['emulator']} ist installiert und bereit zum Starten."),
+            entry=entry,
+        )
+
+    def _confirm_utility_install(self, entry, preview):
+        dialog = ShortcutDialog(entry, self, download_notice=preview.notice)
+        if dialog.exec() != QDialog.DialogCode.Accepted:
+            return
+        shortcuts = dialog.shortcuts
+        self._run_job(
+            f"{entry['emulator']} · Bestätigter Download wird installiert …",
+            lambda progress, log, event: self.service.install(
+                entry, progress, log, event, shortcuts=shortcuts, preview=preview
+            ),
+            lambda _: self._notify(f"{entry['emulator']} ist installiert. Öffne das Tool mit PS4 einrichten und folge den fünf Schritten auf der Karte."),
             entry=entry,
         )
 
@@ -1200,15 +1391,26 @@ class MainWindow(QMainWindow):
         )
 
     @Slot(object)
+    def setup_ps4(self, entry: dict) -> None:
+        if self.worker is not None:
+            return
+        if self.service.is_installed(entry["id"]):
+            self.start_emulator(entry)
+        else:
+            self.install(entry)
+
+    @Slot(object)
     def start_emulator(self, entry: dict) -> None:
         try:
-            self.service.start(entry)
+            note = self.service.start(entry)
         except Exception as exc:
             self._append_log(f"Start fehlgeschlagen: {exc}")
             self._message("Emulator konnte nicht gestartet werden", str(exc), error=True)
         else:
             self._append_log(f"{entry['emulator']} gestartet.")
             self.statusBar().showMessage(f"{entry['emulator']} wurde gestartet.", 6000)
+            if isinstance(note, str) and note:
+                self._notify(note)
             self.refresh()
 
     @Slot(object)
@@ -1314,13 +1516,13 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def check_updates(self) -> None:
-        total = sum(entry["id"] in self.service.installed for entry in self.catalog.items)
+        total = sum(entry["id"] in self.service.installed for entry in self._available_entries())
         if not total:
             self._notify("Installiere zuerst einen Emulator, um anschließend auf Updates zu prüfen.")
             return
 
         def complete(result):
-            update_count = sum("update" in self.service.status(entry["id"]).casefold() for entry in self.catalog.items)
+            update_count = sum("update" in self.service.status(entry["id"]).casefold() for entry in self._available_entries())
             checked = len(result) if isinstance(result, dict) else total
             detail = f" {checked} von {total} Installationen geprüft. Details im Aktivitätsprotokoll." if checked < total else ""
             if update_count:

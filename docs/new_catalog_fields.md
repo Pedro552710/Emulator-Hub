@@ -2,13 +2,54 @@
 
 Alle Erweiterungen behalten `schema_version: 1`. Die neuen Katalogfelder sind optional, damit bisherige Einträge weiterhin geladen werden. Dauerhafte Änderungen auch in `tools/catalog_enrichment.json` eintragen, wenn `tools/import_catalog.py` später erneut verwendet wird.
 
+## Ausgeblendete Einträge
+
+`hidden` ist ein optionaler boolescher Wert, standardmäßig `false`. Mit `true` bleiben Eintrag, Quellen, Installationslogik und gespeicherte Nutzerdaten vollständig erhalten. Die standardmäßig ausgeschaltete Einstellung **Ausgeblendete Einträge anzeigen** steuert Kategorien, Karten, Suche, Favoriten/Verlauf, Systemcheck, Spielebibliothek und Vollbild-Modus; leere Kategorien fehlen ebenfalls. **Alle aktualisieren** verwendet nur sichtbare Einträge. shadPS4 und PS4 PKG Tool tragen vorübergehend `hidden: true`. Dauerhafte Reaktivierung auch in `tools/catalog_enrichment.json` pflegen, damit der Excel-Import `hidden: false` reproduziert.
+
+## Offizielle Direktdownloads
+
+`auto_direct` verwendet die überprüfte `direct_url`. Der optionale `direct_resolver: "winuae"` kennzeichnet den einzigen derzeit unterstützten dynamischen Seitenresolver: `id: "winuae"`, `official_url` und `direct_url` exakt `https://www.winuae.net/download/`, `exe: "winuae64.exe"`, `archive_type: "zip"`. Die aktuelle stabile Versionsüberschrift muss zum tatsächlich verlinkten `WinUAE<Versionsziffern>_x64.zip` unter `https://download.abime.net/winuae/releases/` passen. Kein Treffer, Mehrdeutigkeit, Beta-/Preview-Dateien oder fremde Hosts/Pfade verlangen manuelle Einrichtung. Die sicher erkannte stabile Version wird auch für Updates verwendet. `verified_release`/`verified_asset` dokumentieren nur den Recherchezeitpunkt und schreiben keinen dauerhaften Download fest.
+
+Für WinUAE wurde keine offizielle Prüfsumme gefunden; `verified_asset_sha256: null` dokumentiert das ehrlich. Ohne `direct_resolver` bleibt der vorhandene geprüfte Direktlink-Weg mit optionaler `direct_version`, `sha256` oder `checksum_url` erhalten. Details: [geprüfte WinUAE-Quelle](catalog_sources.md#winuae-stabile-downloadseite-und-amiga-konfiguration).
+
 ## Systemcheck und Dateiendungen
 
 `configs/system_requirements.json` enthält die Schwellen pro `pc_anforderung`, beispielsweise CPU-Kerne, RAM und GPU-Leistungsklasse. `ram_tolerance_gb: 0.5` berücksichtigt, dass Windows bei nominell 32 GiB etwas weniger nutzbaren RAM meldet. CPU-/GPU-Klassen sind grobe Heuristiken; unbekannte GPU-Daten dürfen keine sichere Zusage erzeugen. Der Systemcheck ist eine Einschätzung, keine Garantie für einzelne Spiele.
 
 `configs/extensions.json` enthält `extensions`: Eine Endung mit einem Konsolennamen wird direkt zugeordnet; eine Liste verlangt die manuelle Auswahl. Konsolennamen müssen mit `konsole` im Katalog übereinstimmen. `.iso`, `.bin`, `.zip` und weitere mehrdeutige Formate werden nicht allein anhand ihres Inhalts erraten. Archive werden nicht geöffnet. Ein Scan speichert ausschließlich Pfade und Metadaten in `library.json`.
 
+Für bestehende lokale Konfigurationen ergänzt der Hub fehlende Amiga-Endungen im Arbeitsspeicher. Bei unveränderten alten Standardlisten für `.iso` und `.cue` kommt Amiga als weiterer Kandidat hinzu. Individuell angepasste Zuordnungen und die gespeicherte Konfigurationsdatei bleiben erhalten.
+
 Konfigurationen werden zuerst unter `<Datenordner>/configs`, dann unter `<Programmordner>/configs` und zuletzt aus den mitgelieferten Ressourcen geladen. Die UI zeigt den aktiven Datenordner. JSON-Dateien mit ungültigen Werten erzeugen verständliche Fehlermeldungen.
+
+## Separate Hilfsprogramme und eigene PS4-Pakete
+
+| Feld | Bedeutung |
+| --- | --- |
+| `entry_type` | Ohne Feld bleibt ein Eintrag ein Emulator. `"utility"` kennzeichnet ein Hilfsprogramm, das nicht als Spiel-Emulator gewählt und nicht durch **Alle aktualisieren** heruntergeladen wird. |
+| `package_args` | Für PS4 PKG Tool ausschließlich `["{package}"]`: ein vollständiger eigener Paketpfad als einzelnes Argument ohne Shell. Dieser Aufruf öffnet den Mini PKG Viewer und installiert noch kein Spiel. |
+| `download_notice` | Erforderlicher deutscher Drittanbieterhinweis vor jedem Hilfsprogramm-Download. Die Bestätigung ergänzt die tatsächlich aufgelöste offizielle Quelle und aktuelle SHA-256-Prüfsumme. |
+| `ps4_setup_steps` | Genau fünf kurze Schritte auf der PS4-Karte. **PS4 einrichten** installiert nach Bestätigung oder öffnet das Tool-Hauptfenster. |
+| `deprecated`, `deprecated_note`, `replacement_id` | Veralteten Eintrag für Altinstallationen erhalten; Installation/Updates sperren, ohne Nutzerdaten zu löschen. Ersatz-ID muss einen anderen vorhandenen Katalogeintrag benennen. |
+| `license` | Lizenzhinweis des separat installierten Programms, bei PS4 PKG Tool `"GPL-3.0"`. Keine Einbettung in Hub-Pakete. |
+
+Der Hilfseintrag `ps4-pkg-tool` steht unter **Sony PlayStation** als Hilfsprogramm, stammt ausschließlich aus dem geprüften Repository `pearlxcore/PS4PKGTool` und verwendet `auto_github` nur für ausdrücklich bestätigte stabile Releases. Bei fehlendem eindeutigem Asset oder fehlender offizieller SHA-256 bleibt die manuelle Alternative. Hilfsprogramme erhalten keine `launch_args`, `launch_profiles` oder `launch_extensions` für Emulator-Spielstarts.
+
+Eine eigene `.pkg` wird unabhängig von einer lokalen Endungszuordnung ausschließlich als **Im PS4 PKG Tool installieren** behandelt. Die Bibliothek speichert `package_kind: "ps4_pkg"`, `launchable: false` und keine verwendete Emulator-ID. Die Paketübergabe erfasst keinen Spielstart oder Spielverlauf. Der Hub liest keine Paket-Inhalte und lädt weder Schlüssel noch Spiele herunter. Auch ausdrücklich für PS4 PKG Tool oder eine shadPS4-Altinstallation gespeicherte eigene Spieleordner werden beim Bibliotheksscan auf solche Pakete geprüft; dafür werden keine weiteren Dateien aus diesen Ordnern automatisch aufgenommen. [Manuelle Einrichtung](user-guide.md#eigene-ps4-pakete-mit-ps4-pkg-tool).
+
+## Emulatoren über die Karte starten
+
+| Feld | Bedeutung |
+| --- | --- |
+| `start_args` | Optionale feste Argumentliste für **Starten**, ohne Spielplatzhalter. Bei shadPS4 `["-b"]` für Big Picture. Ohne Feld bleibt der bisherige Kartenstart erhalten. |
+| `start_note` | Deutscher Hinweis zum Kartenstart und dessen Voraussetzungen. |
+| `launcher` | Optionales Frontend mit eigener Startdatei, festen `args` und einem relativen `directory` innerhalb des registrierten Kernordners. |
+
+Die folgenden shadPS4-Metadaten dienen seit 1.0.3 ausschließlich vorhandenen Altinstallationen. Der Hub lädt und aktualisiert weder Kern noch QTLauncher; neue Einrichtung über **PS4 einrichten → Tools > shadPS4 Manager** im Tool.
+
+shadPS4 behält `exe: "shadPS4.exe"` als registrierten Kern. Das manuell bereitgestellte Frontend steht unter `launcher.exe: "shadPS4QtLauncher.exe"`, `launcher.directory: "qtlauncher"` und `launcher.args: []`. Der Hub bevorzugt diese Startdatei im Unterordner oder direkt neben dem Kern. Fehlt sie, wird der Kern mit `start_args: ["-b"]` gestartet. Argumente werden als Liste ohne Shell übergeben. Kern und Launcher bleiben getrennt; die Launcher-Konfiguration wird nicht automatisch geschrieben.
+
+Die Launcher-Quellen stehen in `official_url` und `github_repo` innerhalb von `launcher`; die exakte Repository-Wurzel muss in `official_sources` erlaubt sein. `download_muster` und `archive_type` dokumentieren das geprüfte Windows-Archiv. `verified_release`, `verified_prerelease`, `verified_asset` und `verified_asset_sha256` halten den Recherchezeitpunkt fest. `launcher.install_methode: "manuell"` kennzeichnet bei shadPS4 den fehlenden stabilen Launcher-Release. Das Datums-/Hash-Muster erlaubt keine automatische Installation dieses Pre-Releases. `launcher.note` erklärt die manuelle Einrichtung über Version Manager → Add Custom. Details stehen im [Handbuch](user-guide.md#playstation-4-mit-shadps4).
 
 ## Spiele starten
 
@@ -31,7 +72,11 @@ Unterstützte Platzhalter: `{game}` ist der vollständige eigene Dateipfad, `{ga
 
 MAME verwendet Set-Namen und den eigenen Suchordner. In FinalBurn Neo muss dieser Suchordner zuerst im Emulator eingerichtet werden. Für Genesis Plus GX in RetroArch bleibt das Profil `null`, bis der tatsächlich installierte Core mit `-L` hinterlegt ist. RPCS3 startet eigene entpackte native `.bin`/`.elf`/`.self`-Dateien; PS3-ISOs werden nicht automatisch umgewandelt. xemu erwartet ein eigenes Xbox-XISO. Vita3K kann ein eigenes VPK/ZIP über seinen CLI-Pfad installieren und starten; die ursprüngliche Spiel-Datei bleibt unverändert, der Emulator kann dabei selbst Daten in seinem Profil anlegen.
 
-Geprüfte CLI-Grundlagen: [DuckStation-Argumente](https://github.com/stenzek/duckstation/wiki/Command-Line-Arguments), [PPSSPP-Argumente](https://www.ppsspp.org/docs/reference/command-line/), [MAME-Argumente](https://docs.mamedev.org/commandline/commandline-all.html), [FinalBurn-Neo-CLI](https://github.com/finalburnneo/FBNeo/blob/master/src/burner/win32/main.cpp), [RPCS3-Startcode](https://github.com/RPCS3/rpcs3/blob/master/rpcs3/rpcs3.cpp), [Vita3K-CLI](https://github.com/Vita3K/Vita3K/blob/master/vita3k/config/src/config.cpp), [xemu-Argumente](https://github.com/xemu-project/xemu/blob/master/system/vl.c).
+shadPS4 startet die eigene entschlüsselte `eboot.bin` über den registrierten SDL-Kern mit `["-g", "{game}"]`; das Profil erlaubt nur `.bin`. Dieser direkte Bibliotheksstart verwendet weder QTLauncher noch `start_args`. `-b` und `-g` werden nicht kombiniert, weil der geprüfte Kern bei `-b` vor dem Spielstart zurückkehrt. Der QTLauncher besitzt ebenfalls dokumentierte `-e`-/`-g`-Optionen, doch der Hub nutzt für Spiele ausschließlich den bereits bestätigten direkten Kernstart. Die Endung bleibt mehrdeutig und muss als PlayStation 4 zugeordnet werden. Vollständigen eigenen Spielordner beibehalten; `.pkg` bleibt ein nicht startbares Paket mit separater Viewer-Übergabe. Keine Entschlüsselung oder Paketinstallation durch den Hub. Firmware-Module, Controllerbelegung und gezielte eigene Sicherungspfade bleiben manuell. Details und Quellen stehen unter [shadPS4 im Handbuch](user-guide.md#playstation-4-mit-shadps4).
+
+WinUAE erlaubt ausschließlich vorbereitete eigene `.uae`-Konfigurationen mit `launch_args: ["-f", "{game}", "-s", "use_gui=no"]` und `launch_extensions: [".uae"]`. Rohabbilder erhalten den Hinweis **über WinUAE-Konfiguration zu starten**. Modell, eigene Disk-/Festplatten-/CD-Dateien und legales Kickstart müssen im Profil eingerichtet sein. Die [.uae-Erkennung](https://github.com/tonioni/WinUAE/blob/6030/zfile.cpp#L320), [CLI](https://github.com/tonioni/WinUAE/blob/6030/main.cpp#L1012) und [Konfigurationsoption](https://github.com/tonioni/WinUAE/blob/6030/cfgfile.cpp#L76) sind am stabilen Tag 6030 belegt.
+
+Geprüfte CLI-Grundlagen: [DuckStation-Argumente](https://github.com/stenzek/duckstation/wiki/Command-Line-Arguments), [PPSSPP-Argumente](https://www.ppsspp.org/docs/reference/command-line/), [MAME-Argumente](https://docs.mamedev.org/commandline/commandline-all.html), [FinalBurn-Neo-CLI](https://github.com/finalburnneo/FBNeo/blob/master/src/burner/win32/main.cpp), [RPCS3-Startcode](https://github.com/RPCS3/rpcs3/blob/master/rpcs3/rpcs3.cpp), [Vita3K-CLI](https://github.com/Vita3K/Vita3K/blob/master/vita3k/config/src/config.cpp), [xemu-Argumente](https://github.com/xemu-project/xemu/blob/master/system/vl.c), [shadPS4-Argumente am Release-Tag](https://github.com/shadps4-emu/shadPS4/blob/v.0.19.0/src/main.cpp).
 
 ## Eigene BIOS-Dateien prüfen
 
@@ -52,7 +97,7 @@ Geprüfte CLI-Grundlagen: [DuckStation-Argumente](https://github.com/stenzek/duc
 
 `any_of: true` bedeutet, dass eine der Dateien reicht; sonst werden alle geprüft. `required: false` kennzeichnet einen optionalen oder spielabhängigen Bedarf. Bei Mednafen Saturn ist die für das Spiel passende BIOS-Region erforderlich; die beiden regionalen Prüfungen sind Alternativen. PC-Engine-CD benötigt eine eigene Systemkarte, HuCard-Spiele benötigen sie nicht. Aktuelle melonDS-Versionen können beim direkten DS-Start Ersatzdaten verwenden; DSi benötigt zusätzliche eigene Systemdateien.
 
-Der Checker prüft lediglich, ob eine Datei vorhanden, nicht leer und lesbar ist. Er prüft keine Echtheit, Prüfsumme, Version, Region oder vollständige Firmware-Installation. Für PCSX2, xemu, RPCS3 und Vita3K wäre ein universeller Dateiname irreführend. `bios_note` erklärt deshalb die eigene Einrichtung und die Oberfläche erlaubt die Auswahl tatsächlich verwendeter eigener Dateien. Diese liegen als `bios_overrides[emulator_id]` in `settings.json`; das Zurücksetzen entfernt die Auswahl. Es gibt keine BIOS-/Firmware-Downloads oder Bezugsquellen.
+Der Checker prüft lediglich, ob eine Datei vorhanden, nicht leer und lesbar ist. Er prüft keine Echtheit, Prüfsumme, Version, Region oder vollständige Firmware-Installation. Für PCSX2, xemu, RPCS3, Vita3K und WinUAE wäre ein universeller Dateiname irreführend. WinUAE verwendet einen selbst konfigurierten ROMs-/Kickstart-Pfad und benötigt ein eigenes lizenziertes oder selbst gesichertes Kickstart; deshalb `bios: []` plus Einrichtungsanleitung. Es gibt keine Kickstart-, Spiele- oder Workbench-Downloads oder Links. `bios_note` erklärt deshalb die eigene Einrichtung und die Oberfläche erlaubt die Auswahl tatsächlich verwendeter eigener Dateien. Diese liegen als `bios_overrides[emulator_id]` in `settings.json`; das Zurücksetzen entfernt die Auswahl. Es gibt keine BIOS-/Firmware-Downloads oder Bezugsquellen.
 
 ## Sicherungsprofile
 
